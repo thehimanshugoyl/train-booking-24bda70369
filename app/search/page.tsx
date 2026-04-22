@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Search() {
-  const [form, setForm] = useState({ from: "", to: "" });
+  const [form, setForm] = useState({ from: "", to: "", date: "" });
   const [trains, setTrains] = useState([]);
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState<any>(null);
@@ -22,7 +22,7 @@ export default function Search() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.get(`/api/trains?from=${form.from}&to=${form.to}`);
+      const res = await axios.get(`/api/trains?from=${form.from}&to=${form.to}&date=${form.date}`);
       setTrains(res.data.trains);
     } catch (err) {
       console.error(err);
@@ -46,7 +46,7 @@ export default function Search() {
       {/* Search Form */}
       <div className="bg-gray-800 rounded-xl p-6 mb-6">
         <h2 className="text-xl font-semibold text-yellow-400 mb-4">🔍 Search Trains</h2>
-        <form onSubmit={searchTrains} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <form onSubmit={searchTrains} className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <input
             type="text"
             placeholder="From (e.g. Delhi)"
@@ -59,6 +59,12 @@ export default function Search() {
             placeholder="To (e.g. Mumbai)"
             value={form.to}
             onChange={(e) => setForm({ ...form, to: e.target.value })}
+            className="bg-gray-900 border border-gray-700 rounded-lg p-3 text-white"
+          />
+          <input
+            type="date"
+            value={form.date}
+            onChange={(e) => setForm({ ...form, date: e.target.value })}
             className="bg-gray-900 border border-gray-700 rounded-lg p-3 text-white"
           />
           <button type="submit" className="bg-blue-600 hover:bg-blue-700 rounded-lg p-3 font-semibold">
@@ -74,13 +80,13 @@ export default function Search() {
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="text-xl font-bold text-white">{train.trainName}</h3>
-                <p className="text-gray-400 text-sm">Train No: {train.trainNumber}</p>
+                <p className="text-gray-400 text-sm">Train No: {train.trainNumber} • 📅 {train.date}</p>
                 <div className="flex gap-6 mt-2">
                   <div>
                     <p className="text-blue-400 font-semibold">{train.from}</p>
                     <p className="text-gray-300 text-sm">{train.departureTime}</p>
                   </div>
-                  <div className="text-gray-500 self-center">→</div>
+                  <div className="text-gray-500 self-center text-xl">→</div>
                   <div>
                     <p className="text-green-400 font-semibold">{train.to}</p>
                     <p className="text-gray-300 text-sm">{train.arrivalTime}</p>
@@ -95,7 +101,7 @@ export default function Search() {
                   disabled={train.availableSeats === 0}
                   className="mt-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 px-4 py-2 rounded-lg text-sm font-semibold"
                 >
-                  Book Now
+                  {train.availableSeats === 0 ? "Sold Out" : "Book Now"}
                 </button>
               </div>
             </div>
@@ -132,17 +138,14 @@ export default function Search() {
                 <div className="flex gap-3 mt-3">
                   <button
                     onClick={() => {
-                      router.push(`/payment?trainId=${train._id}&seats=${bookingForm.seats}&passengerName=${encodeURIComponent(bookingForm.passengerName)}&passengerAge=${bookingForm.passengerAge}&price=${train.price * bookingForm.seats}&trainName=${encodeURIComponent(train.trainName)}&from=${encodeURIComponent(train.from)}&to=${encodeURIComponent(train.to)}`);
+                      router.push(`/payment?trainId=${train._id}&seats=${bookingForm.seats}&passengerName=${encodeURIComponent(bookingForm.passengerName)}&passengerAge=${bookingForm.passengerAge}&price=${train.price * bookingForm.seats}&trainName=${encodeURIComponent(train.trainName)}&from=${encodeURIComponent(train.from)}&to=${encodeURIComponent(train.to)}&date=${encodeURIComponent(train.date)}`);
                     }}
                     disabled={!bookingForm.passengerName || !bookingForm.passengerAge}
                     className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 px-6 py-2 rounded-lg font-semibold"
                   >
                     Proceed to Pay — ₹{train.price * bookingForm.seats}
                   </button>
-                  <button
-                    onClick={() => setBooking(null)}
-                    className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg"
-                  >
+                  <button onClick={() => setBooking(null)} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded-lg">
                     Cancel
                   </button>
                 </div>
@@ -151,7 +154,15 @@ export default function Search() {
           </div>
         ))}
         {trains.length === 0 && !loading && (
-          <p className="text-gray-400 text-center py-10">Search for trains to see results</p>
+          <div className="text-center py-16">
+            <p className="text-gray-500 text-lg">🔍 Search for trains to see results</p>
+            <p className="text-gray-600 text-sm mt-2">Enter source and destination city above</p>
+          </div>
+        )}
+        {loading && (
+          <div className="text-center py-16">
+            <p className="text-gray-400 text-lg">Searching trains...</p>
+          </div>
         )}
       </div>
     </div>
