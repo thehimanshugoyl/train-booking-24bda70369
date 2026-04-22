@@ -6,9 +6,14 @@ import Booking from "@/models/Booking";
 import { verifyToken } from "@/lib/auth";
 import mongoose from "mongoose";
 
-const Visit = mongoose.models.Visit || mongoose.model("Visit", new mongoose.Schema({
-  ip: String, userAgent: String, page: String, timestamp: { type: Date, default: Date.now }
-}));
+const visitSchema = new mongoose.Schema({
+  ip: String,
+  userAgent: String,
+  page: String,
+  timestamp: { type: Date, default: Date.now },
+});
+
+const Visit = mongoose.models.Visit || mongoose.model("Visit", visitSchema);
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,16 +23,26 @@ export async function GET(req: NextRequest) {
     const decoded: any = verifyToken(token);
     if (decoded.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const [totalUsers, totalTrains, totalBookings, confirmedBookings, cancelledBookings, recentUsers, recentBookings, totalVisits, todayVisits] = await Promise.all([
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const [
+      totalUsers, totalTrains, totalBookings,
+      confirmedBookings, cancelledBookings,
+      recentUsers, recentBookings,
+      totalVisits, todayVisits
+    ] = await Promise.all([
       User.countDocuments(),
       Train.countDocuments(),
       Booking.countDocuments(),
       Booking.countDocuments({ status: "confirmed" }),
       Booking.countDocuments({ status: "cancelled" }),
       User.find().sort({ createdAt: -1 }).limit(10).select("-password"),
-      Booking.find().sort({ createdAt: -1 }).limit(10).populate("user", "name email").populate("train", "trainName from to"),
+      Booking.find().sort({ createdAt: -1 }).limit(10)
+        .populate("user", "name email")
+        .populate("train", "trainName from to"),
       Visit.countDocuments(),
-      Visit.countDocuments({ timestamp: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } }),
+      Visit.countDocuments({ timestamp: { $gte: todayStart } }),
     ]);
 
     const revenue = await Booking.aggregate([
