@@ -4,6 +4,7 @@ import axios from "axios";
 import Link from "next/link";
 import { generateTicketPdf } from "@/lib/ticketPdf";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function PnrPage() {
   const [pnr, setPnr] = useState("");
@@ -33,14 +34,15 @@ export default function PnrPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white p-4 md:p-6 flex flex-col justify-between">
       {/* Navbar */}
-      <nav className="flex justify-between items-center mb-8 bg-gray-850 border border-gray-800 rounded-2xl p-4 shadow-lg max-w-6xl mx-auto w-full">
+      <nav className="flex justify-between items-center mb-8 bg-gray-850 border border-gray-800 rounded-2xl p-4 shadow-lg max-w-6xl mx-auto w-full gap-3">
         <Link href="/">
           <Logo size="sm" />
         </Link>
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Link
             href="/search"
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl text-sm font-semibold transition"
+            className="bg-white text-black hover:bg-zinc-200 px-4 py-2 rounded-xl text-sm font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
           >
             🔍 Search Trains
           </Link>
@@ -56,8 +58,8 @@ export default function PnrPage() {
       {/* Main Container */}
       <main className="max-w-3xl mx-auto w-full my-auto">
         <div className="text-center mb-8">
-          <div className="inline-block bg-yellow-950/40 border border-yellow-500/30 text-yellow-400 text-xs px-3 py-1 rounded-full mb-3">
-            Official Indian Railways PNR Inquiry
+          <div className="inline-block bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs px-3 py-1 rounded-full mb-3">
+            Live PNR Inquiry & Status
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2">
             Passenger Current Status Enquiries
@@ -87,7 +89,7 @@ export default function PnrPage() {
             <button
               type="submit"
               disabled={loading || pnr.length !== 10}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-8 py-3.5 rounded-xl font-bold text-white transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2"
+              className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 px-8 py-3.5 rounded-xl font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? "Checking..." : "Get Status"}
             </button>

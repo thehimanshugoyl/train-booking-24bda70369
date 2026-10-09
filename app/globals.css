@@ -1,26 +1,175 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #05070b;
+  --foreground: #f8fafc;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html.light,
+html[data-theme="light"] {
+  --background: #f8fafc;
+  --foreground: #09090b;
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.dark,
+html[data-theme="dark"] {
+  --background: #05070b;
+  --foreground: #f8fafc;
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* ========================================================
+   LIGHT THEME (WHITE) REFINEMENTS
+   ======================================================== */
+html.light .bg-gray-950,
+html.light .bg-zinc-950,
+html.light .bg-black {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-gray-900,
+html.light .bg-zinc-900 {
+  background-color: #f8fafc !important;
+}
+
+html.light .bg-gray-900\/60,
+html.light .bg-zinc-900\/60,
+html.light .bg-gray-900\/80,
+html.light .bg-gray-900\/90 {
+  background-color: rgba(248, 250, 252, 0.85) !important;
+}
+
+html.light .bg-gray-850,
+html.light .bg-gray-800,
+html.light .bg-zinc-800,
+html.light .bg-gray-800\/80 {
+  background-color: #f1f5f9 !important;
+}
+
+html.light .bg-gray-750,
+html.light .bg-gray-700,
+html.light .bg-zinc-700 {
+  background-color: #e2e8f0 !important;
+}
+
+html.light .border-gray-850,
+html.light .border-gray-800,
+html.light .border-zinc-800,
+html.light .border-gray-750,
+html.light .border-gray-700,
+html.light .border-zinc-700 {
+  border-color: #e2e8f0 !important;
+}
+
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-gray-100,
+html.light .text-gray-200,
+html.light .text-gray-300,
+html.light .text-zinc-200,
+html.light .text-zinc-300 {
+  color: #334155 !important;
+}
+
+html.light .text-gray-400,
+html.light .text-zinc-400 {
+  color: #64748b !important;
+}
+
+html.light .text-gray-500,
+html.light .text-zinc-500 {
+  color: #94a3b8 !important;
+}
+
+/* Light theme inputs */
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* ========================================================
+   PRIMARY BUTTON: CRISP MONOCHROME WHITE / BLACK AESTHETIC
+   ======================================================== */
+.btn-primary,
+.bg-blue-600 {
+  background-color: #ffffff !important;
+  color: #09090b !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 14px 0 rgba(255, 255, 255, 0.15) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-primary:hover,
+.bg-blue-600:hover,
+.hover\:bg-blue-500:hover,
+.hover\:bg-blue-700:hover {
+  background-color: #e4e4e7 !important;
+  color: #000000 !important;
+  transform: translateY(-1px);
+}
+
+/* In Light Theme (White), primary buttons become solid black */
+html.light .btn-primary,
+html.light .bg-blue-600 {
+  background-color: #09090b !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+html.light .btn-primary:hover,
+html.light .bg-blue-600:hover,
+html.light .hover\:bg-blue-500:hover,
+html.light .hover\:bg-blue-700:hover {
+  background-color: #27272a !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* Blue accents converted to clean white / slate */
+.text-blue-400,
+.text-blue-500 {
+  color: #ffffff !important;
+}
+html.light .text-blue-400,
+html.light .text-blue-500 {
+  color: #09090b !important;
+}
+
+.border-blue-500,
+.border-blue-600 {
+  border-color: #52525b !important;
+}
+html.light .border-blue-500,
+html.light .border-blue-600 {
+  border-color: #cbd5e1 !important;
+}
+
+.bg-blue-950,
+.bg-blue-900\/40,
+.bg-blue-950\/70 {
+  background-color: #18181b !important;
+}
+html.light .bg-blue-950,
+html.light .bg-blue-900\/40,
+html.light .bg-blue-950\/70 {
+  background-color: #f1f5f9 !important;
 }

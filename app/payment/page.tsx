@@ -6,6 +6,8 @@ import axios from "axios";
 import { Suspense } from "react";
 import Link from "next/link";
 import { generateTicketPdf } from "@/lib/ticketPdf";
+import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 function PaymentContent() {
   const [step, setStep] = useState(1);
@@ -112,7 +114,14 @@ Thank you for traveling with RailX!
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-6 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-6 flex flex-col items-center justify-center">
+      <div className="w-full max-w-lg mb-4 flex justify-between items-center">
+        <Link href="/">
+          <Logo size="sm" />
+        </Link>
+        <ThemeToggle />
+      </div>
+
       <div className="bg-gray-850 border border-gray-800 rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl">
         {/* Step Indicator */}
         <div className="flex justify-between mb-8">
@@ -121,9 +130,9 @@ Thank you for traveling with RailX!
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${
                   step > i + 1
-                    ? "bg-green-600 text-white"
+                    ? "bg-emerald-500 text-black"
                     : step === i + 1
-                    ? "bg-blue-600 text-white ring-4 ring-blue-600/30"
+                    ? "bg-white text-black ring-4 ring-white/20 dark:bg-white dark:text-black light:bg-black light:text-white"
                     : "bg-gray-800 text-gray-500"
                 }`}
               >
@@ -131,7 +140,7 @@ Thank you for traveling with RailX!
               </div>
               <span
                 className={`ml-2 text-xs font-medium hidden sm:inline ${
-                  step === i + 1 ? "text-white" : "text-gray-500"
+                  step === i + 1 ? "text-white font-bold" : "text-gray-500"
                 }`}
               >
                 {s.split(". ")[1]}
@@ -203,7 +212,7 @@ Thank you for traveling with RailX!
 
             <button
               onClick={() => setStep(2)}
-              className="w-full bg-blue-600 hover:bg-blue-700 py-3.5 rounded-xl font-bold text-white transition shadow-lg shadow-blue-600/30"
+              className="w-full bg-white text-black hover:bg-zinc-200 py-3.5 rounded-xl font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
             >
               Proceed to Payment →
             </button>
@@ -213,7 +222,7 @@ Thank you for traveling with RailX!
         {/* Step 2 - Payment Form */}
         {step === 2 && (
           <div>
-            <h2 className="text-xl font-bold text-blue-400 mb-1">💳 Payment Gateway</h2>
+            <h2 className="text-xl font-bold text-white mb-1">💳 Payment Gateway</h2>
             <p className="text-xs text-gray-400 mb-5">
               Encrypted mock checkout simulation (test credentials accepted)
             </p>
@@ -224,7 +233,9 @@ Thank you for traveling with RailX!
                   key={i}
                   type="button"
                   className={`flex-1 py-2 rounded-xl text-xs font-semibold transition ${
-                    i === 0 ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400"
+                    i === 0
+                      ? "bg-white text-black shadow-sm dark:bg-white dark:text-black light:bg-black light:text-white"
+                      : "bg-gray-800 text-gray-400"
                   }`}
                 >
                   {method}
@@ -312,7 +323,7 @@ Thank you for traveling with RailX!
                 <button
                   type="submit"
                   disabled={processing}
-                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 py-3.5 rounded-xl font-bold text-white transition shadow-lg shadow-green-700/30"
+                  className="flex-1 bg-white text-black hover:bg-zinc-200 disabled:opacity-50 py-3.5 rounded-xl font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
                 >
                   {processing ? "⏳ Processing Transaction..." : `Pay ₹${price}`}
                 </button>
@@ -325,24 +336,24 @@ Thank you for traveling with RailX!
         {step === 3 && booking && (
           <div className="text-center">
             <div className="text-5xl mb-2">🎉</div>
-            <h2 className="text-2xl font-black text-green-400 mb-1">Payment Successful!</h2>
+            <h2 className="text-2xl font-black text-white mb-1">Payment Successful!</h2>
             <p className="text-xs text-gray-400 mb-6">
-              Your railway reservation has been confirmed with IRCTC partner RailX
+              Your railway reservation has been confirmed with GADDVYA
             </p>
 
             {/* Ticket Card Preview */}
-            <div className="bg-gray-900 rounded-2xl p-5 border border-green-700/60 mb-6 text-left relative overflow-hidden">
+            <div className="bg-gray-900 rounded-2xl p-5 border border-zinc-700 mb-6 text-left relative overflow-hidden">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-blue-400 font-bold text-base">🚂 RAILX BOARDING PASS</span>
-                <span className="bg-green-900/80 text-green-300 text-xs px-2.5 py-0.5 rounded-full font-bold">
+                <span className="text-white font-bold text-base">🚂 GADDVYA BOARDING PASS</span>
+                <span className="bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">
                   CONFIRMED
                 </span>
               </div>
 
               {/* PNR Banner */}
-              <div className="bg-yellow-950/50 border border-yellow-500/40 p-2.5 rounded-xl mb-3 flex justify-between items-center">
-                <span className="text-xs text-yellow-400 font-semibold">PNR NUMBER</span>
-                <span className="text-yellow-300 font-mono font-black text-base tracking-wider">
+              <div className="bg-zinc-950 border border-zinc-800 p-2.5 rounded-xl mb-3 flex justify-between items-center">
+                <span className="text-xs text-zinc-400 font-semibold">PNR NUMBER</span>
+                <span className="text-white font-mono font-black text-base tracking-wider">
                   {booking.pnr}
                 </span>
               </div>
@@ -354,7 +365,7 @@ Thank you for traveling with RailX!
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Class:</span>
-                  <span className="text-blue-300 font-bold">{classType}</span>
+                  <span className="text-zinc-200 font-bold">{classType}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Seats:</span>
@@ -362,7 +373,7 @@ Thank you for traveling with RailX!
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Amount Paid:</span>
-                  <span className="text-yellow-400 font-bold">₹{price}</span>
+                  <span className="text-white font-bold">₹{price}</span>
                 </div>
               </div>
             </div>
@@ -371,7 +382,7 @@ Thank you for traveling with RailX!
             <div className="space-y-2.5">
               <button
                 onClick={() => generateTicketPdf(booking)}
-                className="w-full bg-blue-600 hover:bg-blue-700 py-3.5 rounded-xl font-bold text-white transition flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30"
+                className="w-full bg-white text-black hover:bg-zinc-200 py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
               >
                 <span>📥 Download PDF Boarding Pass</span>
               </button>

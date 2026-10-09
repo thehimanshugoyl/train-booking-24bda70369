@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import AnimatedTrainBackground from "@/components/AnimatedTrainBackground";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Register() {
   const [step, setStep] = useState(1);
@@ -199,9 +200,12 @@ export default function Register() {
 
   return (
     <AnimatedTrainBackground>
-      <Link href="/" className="mb-6 transition-transform hover:scale-105">
-        <Logo size="lg" />
-      </Link>
+      <div className="flex items-center justify-between w-full max-w-xl mb-6">
+        <Link href="/" className="transition-transform hover:scale-105">
+          <Logo size="md" />
+        </Link>
+        <ThemeToggle />
+      </div>
 
       <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 w-full max-w-xl shadow-2xl shadow-black/80 ring-1 ring-white/5">
         {/* Step Wizard Header */}
@@ -215,9 +219,9 @@ export default function Register() {
               <span
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                   step === s.num
-                    ? "bg-blue-600 text-white ring-4 ring-blue-600/30"
+                    ? "bg-white text-black ring-4 ring-white/20 dark:bg-white dark:text-black light:bg-black light:text-white"
                     : step > s.num
-                    ? "bg-green-600 text-white"
+                    ? "bg-emerald-500 text-black"
                     : "bg-gray-800 text-gray-500"
                 }`}
               >
@@ -356,7 +360,7 @@ export default function Register() {
                 setError("");
                 setStep(2);
               }}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-sm transition mt-4 shadow-lg shadow-blue-600/30"
+              className="w-full bg-white text-black hover:bg-zinc-200 font-bold py-3.5 rounded-xl text-sm transition mt-4 shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
             >
               Continue to OTP Verification →
             </button>
@@ -379,7 +383,7 @@ export default function Register() {
                 <label className="text-xs text-gray-300 font-semibold flex items-center gap-1.5">
                   <span>✉️ Registered Email Address</span>
                   {isEmailVerified && (
-                    <span className="bg-green-900 text-green-300 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                    <span className="bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">
                       ✓ Verified
                     </span>
                   )}
@@ -400,7 +404,7 @@ export default function Register() {
                     type="button"
                     onClick={handleSendEmailOtp}
                     disabled={loading || emailTimer > 0}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs px-4 py-2.5 rounded-xl font-semibold transition whitespace-nowrap"
+                    className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 text-xs px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap dark:bg-white dark:text-black light:bg-black light:text-white"
                   >
                     {emailTimer > 0 ? `Resend (${emailTimer}s)` : emailOtpSent ? "Resend OTP" : "Send OTP"}
                   </button>
@@ -408,13 +412,13 @@ export default function Register() {
               </div>
 
               {emailPreviewOtp && !isEmailVerified && (
-                <div className="bg-blue-950/70 border border-blue-500/40 p-2 rounded-lg mb-3 flex justify-between items-center text-xs">
-                  <span className="text-blue-300">⚡ Dev Preview Code:</span>
-                  <span className="font-mono font-bold text-yellow-300 text-sm">{emailPreviewOtp}</span>
+                <div className="bg-zinc-850 border border-zinc-700 p-2 rounded-lg mb-3 flex justify-between items-center text-xs">
+                  <span className="text-zinc-300">⚡ Dev Preview Code:</span>
+                  <span className="font-mono font-bold text-amber-300 text-sm">{emailPreviewOtp}</span>
                   <button
                     type="button"
                     onClick={() => setEmailOtp(emailPreviewOtp)}
-                    className="text-[11px] bg-blue-600 px-2 py-0.5 rounded text-white"
+                    className="text-[11px] bg-zinc-700 hover:bg-zinc-600 px-2 py-0.5 rounded text-white font-semibold"
                   >
                     Auto-Fill
                   </button>
@@ -435,7 +439,7 @@ export default function Register() {
                     type="button"
                     onClick={handleVerifyEmailOtp}
                     disabled={loading || emailOtp.length !== 6}
-                    className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs px-5 py-2.5 rounded-xl font-bold transition"
+                    className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 text-xs px-5 py-2.5 rounded-xl font-bold transition dark:bg-white dark:text-black light:bg-black light:text-white"
                   >
                     Verify Email
                   </button>
@@ -449,7 +453,7 @@ export default function Register() {
                 <label className="text-xs text-gray-300 font-semibold flex items-center gap-1.5">
                   <span>📱 Indian Mobile Number (+91)</span>
                   {isPhoneVerified && (
-                    <span className="bg-green-900 text-green-300 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                    <span className="bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">
                       ✓ Verified
                     </span>
                   )}
@@ -474,7 +478,7 @@ export default function Register() {
                     type="button"
                     onClick={handleSendPhoneOtp}
                     disabled={loading || phoneTimer > 0}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs px-4 py-2.5 rounded-xl font-semibold transition whitespace-nowrap"
+                    className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 text-xs px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap dark:bg-white dark:text-black light:bg-black light:text-white"
                   >
                     {phoneTimer > 0 ? `Resend (${phoneTimer}s)` : phoneOtpSent ? "Resend OTP" : "Send SMS"}
                   </button>
@@ -482,13 +486,13 @@ export default function Register() {
               </div>
 
               {phonePreviewOtp && !isPhoneVerified && (
-                <div className="bg-blue-950/70 border border-blue-500/40 p-2 rounded-lg mb-3 flex justify-between items-center text-xs">
-                  <span className="text-blue-300">⚡ Dev Preview Code:</span>
-                  <span className="font-mono font-bold text-yellow-300 text-sm">{phonePreviewOtp}</span>
+                <div className="bg-zinc-850 border border-zinc-700 p-2 rounded-lg mb-3 flex justify-between items-center text-xs">
+                  <span className="text-zinc-300">⚡ Dev Preview Code:</span>
+                  <span className="font-mono font-bold text-amber-300 text-sm">{phonePreviewOtp}</span>
                   <button
                     type="button"
                     onClick={() => setPhoneOtp(phonePreviewOtp)}
-                    className="text-[11px] bg-blue-600 px-2 py-0.5 rounded text-white"
+                    className="text-[11px] bg-zinc-700 hover:bg-zinc-600 px-2 py-0.5 rounded text-white font-semibold"
                   >
                     Auto-Fill
                   </button>
@@ -509,7 +513,7 @@ export default function Register() {
                     type="button"
                     onClick={handleVerifyPhoneOtp}
                     disabled={loading || phoneOtp.length !== 6}
-                    className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs px-5 py-2.5 rounded-xl font-bold transition"
+                    className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 text-xs px-5 py-2.5 rounded-xl font-bold transition dark:bg-white dark:text-black light:bg-black light:text-white"
                   >
                     Verify SMS
                   </button>
@@ -535,7 +539,7 @@ export default function Register() {
                   setError("");
                   setStep(3);
                 }}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-blue-600/30"
+                className="flex-1 bg-white text-black hover:bg-zinc-200 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
               >
                 Continue to Password Setup →
               </button>
@@ -548,7 +552,7 @@ export default function Register() {
           <form onSubmit={handleFinalSubmit} className="space-y-4">
             <h2 className="text-lg font-bold text-white mb-1">Set Security Password</h2>
             <p className="text-xs text-gray-400 mb-4">
-              Create a secure password to protect your RailX account and reservation history.
+              Create a secure password to protect your GADDVYA account and reservation history.
             </p>
 
             <div>
@@ -558,7 +562,7 @@ export default function Register() {
                 placeholder="At least 6 characters"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-blue-500 focus:outline-none"
+                className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-zinc-400 focus:outline-none"
                 required
               />
             </div>
@@ -570,7 +574,7 @@ export default function Register() {
                 placeholder="Re-enter password"
                 value={form.confirmPassword}
                 onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-                className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-blue-500 focus:outline-none"
+                className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-zinc-400 focus:outline-none"
                 required
               />
             </div>
@@ -583,12 +587,12 @@ export default function Register() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Email:</span>
-                <span className="text-green-400 font-mono">✓ {form.email}</span>
+                <span className="text-emerald-400 font-mono">✓ {form.email}</span>
               </div>
               {form.phone && (
                 <div className="flex justify-between">
                   <span className="text-gray-400">Mobile:</span>
-                  <span className="text-blue-300 font-mono">+91 {form.phone}</span>
+                  <span className="text-zinc-200 font-mono">+91 {form.phone}</span>
                 </div>
               )}
             </div>
@@ -604,7 +608,7 @@ export default function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-green-700/30"
+                className="flex-1 bg-white text-black hover:bg-zinc-200 disabled:opacity-50 font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
               >
                 {loading ? "Activating Profile..." : "Complete Registration & Sign In"}
               </button>
@@ -614,7 +618,7 @@ export default function Register() {
 
         <p className="text-gray-400 text-xs text-center mt-6 border-t border-gray-800 pt-4">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-400 font-semibold hover:underline">
+          <Link href="/login" className="text-zinc-200 dark:text-zinc-200 light:text-zinc-900 font-bold hover:underline">
             Sign In Here
           </Link>
         </p>

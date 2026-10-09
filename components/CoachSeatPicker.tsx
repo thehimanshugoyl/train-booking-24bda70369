@@ -91,7 +91,7 @@ export default function CoachSeatPicker({
         <div>
           <h4 className="text-white font-bold text-sm flex items-center gap-2">
             <span>💺 Coach Compartment:</span>
-            <span className="bg-blue-900/60 text-blue-300 font-mono px-2 py-0.5 rounded text-xs">
+            <span className="bg-zinc-800 text-zinc-200 border border-zinc-700 font-mono px-2 py-0.5 rounded text-xs">
               {coachCode} ({classType})
             </span>
           </h4>
@@ -107,8 +107,8 @@ export default function CoachSeatPicker({
             <span className="text-gray-400">Available</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded bg-blue-600 border border-blue-400 inline-block"></span>
-            <span className="text-blue-300 font-medium">Selected</span>
+            <span className="w-3.5 h-3.5 rounded bg-white border border-zinc-200 inline-block"></span>
+            <span className="text-zinc-200 font-medium">Selected</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3.5 h-3.5 rounded bg-red-950 border border-red-800/80 inline-block"></span>
@@ -143,18 +143,18 @@ export default function CoachSeatPicker({
                   onClick={() => toggleSeat(seatId)}
                   disabled={isOccupied}
                   title={`${seatId} - ${seatType} (${isOccupied ? "Occupied" : "Available"})`}
-                  className={`flex flex-col items-center justify-center p-2 rounded-lg border text-xs transition duration-150 relative ${
+                  className={`flex flex-col items-center justify-center p-2 rounded-lg border text-xs transition duration-150 relative cursor-pointer ${
                     isOccupied
                       ? "bg-red-950/40 border-red-900/60 text-gray-600 cursor-not-allowed opacity-60"
                       : isSelected
-                      ? "bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-600/40 ring-2 ring-blue-400"
-                      : "bg-gray-800/90 border-gray-700 text-gray-200 hover:border-blue-400 hover:bg-gray-750"
+                      ? "bg-white border-zinc-200 text-black shadow-lg shadow-white/20 ring-2 ring-white/50"
+                      : "bg-gray-800/90 border-gray-700 text-gray-200 hover:border-zinc-400 hover:bg-gray-750"
                   }`}
                 >
                   <span className="font-mono font-bold text-[11px]">{seatNum}</span>
                   <span
-                    className={`text-[9px] mt-0.5 truncate max-w-full ${
-                      isSelected ? "text-blue-100" : "text-gray-400"
+                    className={`text-[9px] mt-0.5 truncate max-w-full font-medium ${
+                      isSelected ? "text-zinc-800" : "text-gray-400"
                     }`}
                   >
                     {seatType.split(" ")[0]}
@@ -171,7 +171,7 @@ export default function CoachSeatPicker({
         <div>
           Selected Seat(s):{" "}
           {selectedSeats.length > 0 ? (
-            <span className="text-blue-400 font-mono font-bold">
+            <span className="text-white font-mono font-bold">
               {selectedSeats.join(", ")}
             </span>
           ) : (

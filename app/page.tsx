@@ -1,17 +1,18 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between transition-colors">
       {/* Navigation Bar */}
       <header className="border-b border-gray-850 bg-gray-900/60 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-4">
           <Link href="/">
             <Logo size="md" />
           </Link>
 
-          <nav className="flex items-center gap-3 sm:gap-4">
+          <nav className="flex items-center gap-2 sm:gap-4">
             <Link
               href="/search"
               className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
@@ -24,7 +25,11 @@ export default function Home() {
             >
               PNR Status
             </Link>
-            <div className="h-5 w-[1px] bg-gray-800 mx-1"></div>
+            
+            {/* Black / White Theme Switcher */}
+            <ThemeToggle />
+
+            <div className="h-5 w-[1px] bg-gray-800 mx-1 hidden sm:block"></div>
             <Link
               href="/login"
               className="text-gray-200 hover:text-white bg-gray-800/80 hover:bg-gray-700/80 border border-gray-750 px-4 py-2 rounded-xl text-sm font-medium transition"
@@ -33,7 +38,7 @@ export default function Home() {
             </Link>
             <Link
               href="/register"
-              className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-semibold transition shadow-lg shadow-blue-600/25"
+              className="bg-white text-black hover:bg-zinc-200 px-5 py-2 rounded-xl text-sm font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
             >
               Get Started
             </Link>
@@ -44,9 +49,9 @@ export default function Home() {
       {/* Hero Section */}
       <main className="flex-1 max-w-7xl mx-auto px-6 py-16 w-full flex flex-col items-center justify-center text-center">
         {/* Release Pill */}
-        <div className="inline-flex items-center gap-2 bg-blue-950/70 border border-blue-500/30 px-4 py-1.5 rounded-full mb-8">
+        <div className="inline-flex items-center gap-2 bg-zinc-900/80 border border-zinc-750 px-4 py-1.5 rounded-full mb-8 shadow-sm">
           <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span className="text-xs text-blue-300 font-medium">
+          <span className="text-xs text-zinc-300 font-medium">
             🇮🇳 25,571 Daily Trains Across India • Verified Mobile & Email Dual-OTP
           </span>
         </div>
@@ -54,7 +59,7 @@ export default function Home() {
         {/* Hero Title */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6 max-w-4xl leading-tight">
           Pan-India Railway Travel <br />
-          <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent dark:from-white dark:via-zinc-200 dark:to-zinc-400 light:from-black light:via-zinc-800 light:to-zinc-600">
             Fast, Authentic & Verified.
           </span>
         </h1>
@@ -67,13 +72,13 @@ export default function Home() {
         <div className="flex flex-wrap gap-4 justify-center mb-16">
           <Link
             href="/search"
-            className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3.5 rounded-2xl font-semibold text-lg transition shadow-xl shadow-blue-600/30 flex items-center gap-2"
+            className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 rounded-2xl font-bold text-lg transition shadow-xl shadow-white/10 flex items-center gap-2 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
           >
             <span>🔍 Search 25,500+ Trains</span>
           </Link>
           <Link
             href="/register"
-            className="bg-gray-800 hover:bg-gray-750 text-gray-200 border border-gray-700 px-8 py-3.5 rounded-2xl font-semibold text-lg transition flex items-center gap-2"
+            className="bg-gray-850 hover:bg-gray-800 text-gray-200 border border-gray-750 px-8 py-3.5 rounded-2xl font-semibold text-lg transition flex items-center gap-2"
           >
             <span>🔐 Create Verified Account</span>
           </Link>
@@ -125,7 +130,7 @@ export default function Home() {
             </div>
             <Link
               href="/search"
-              className="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1"
+              className="text-xs text-zinc-300 hover:text-white font-semibold flex items-center gap-1 transition"
             >
               Explore all train schedules →
             </Link>
@@ -144,7 +149,7 @@ export default function Home() {
                 <span className="bg-emerald-950/90 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono px-2.5 py-1 rounded-full font-bold uppercase tracking-wider mb-2 inline-block">
                   Semi-High Speed 160 KM/H
                 </span>
-                <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition">
+                <h3 className="text-xl font-bold text-white group-hover:text-zinc-300 transition">
                   Vande Bharat & Tejas Rajdhani Express
                 </h3>
                 <p className="text-xs text-gray-300 mt-1 line-clamp-2 leading-relaxed">
@@ -162,10 +167,10 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-transparent" />
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                <span className="bg-blue-950/90 text-blue-300 border border-blue-500/40 text-[10px] font-mono px-2.5 py-1 rounded-full font-bold uppercase tracking-wider mb-2 inline-block">
+                <span className="bg-zinc-800/90 text-zinc-200 border border-zinc-600/40 text-[10px] font-mono px-2.5 py-1 rounded-full font-bold uppercase tracking-wider mb-2 inline-block">
                   Redeveloped World-Class Hubs
                 </span>
-                <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition">
+                <h3 className="text-xl font-bold text-white group-hover:text-zinc-300 transition">
                   Modern Glass-Dome Mega Terminals
                 </h3>
                 <p className="text-xs text-gray-300 mt-1 line-clamp-2 leading-relaxed">
@@ -193,7 +198,7 @@ export default function Home() {
                 href="/search"
                 className="bg-gray-900/40 hover:bg-gray-850 border border-gray-800 p-4 rounded-xl text-left transition block group"
               >
-                <p className="text-white font-semibold group-hover:text-blue-400 transition text-sm">
+                <p className="text-white font-semibold group-hover:text-zinc-300 transition text-sm">
                   {r.route}
                 </p>
                 <p className="text-gray-400 text-xs mt-1">{r.train}</p>

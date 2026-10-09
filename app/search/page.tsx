@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import CoachSeatPicker from "@/components/CoachSeatPicker";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface PassengerItem {
   name: string;
@@ -134,22 +135,25 @@ export default function Search() {
   return (
     <div className="min-h-screen bg-gray-950 text-white p-4 md:p-6">
       {/* Navbar */}
-      <nav className="flex justify-between items-center mb-8 bg-gray-850 border border-gray-800 rounded-2xl p-4 shadow-lg">
+      <nav className="flex flex-wrap justify-between items-center mb-8 bg-gray-850 border border-gray-800 rounded-2xl p-4 shadow-lg gap-3">
         <Link href="/">
           <Logo size="sm" />
         </Link>
-        <div className="flex gap-2 sm:gap-3 items-center">
-          <span className="text-gray-300 text-sm hidden sm:inline">Hello, {user?.name}</span>
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
+          <span className="text-gray-300 text-sm hidden md:inline">Hello, {user?.name}</span>
+          
+          <ThemeToggle />
+
           <Link
             href="/pnr"
-            className="bg-gray-800 hover:bg-gray-750 text-yellow-300 border border-yellow-500/30 px-3 py-1.5 rounded-lg text-sm font-semibold transition"
+            className="bg-gray-800 hover:bg-gray-750 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-lg text-sm font-semibold transition"
           >
             Track PNR
           </Link>
           {user?.role === "admin" && (
             <Link
               href="/admin"
-              className="bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded-lg text-sm font-semibold transition"
+              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition"
             >
               ⚙️ Admin
             </Link>
@@ -171,7 +175,7 @@ export default function Search() {
               logout();
               router.push("/login");
             }}
-            className="bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg text-sm font-medium transition"
+            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
           >
             Logout
           </button>
@@ -262,7 +266,7 @@ export default function Search() {
           <div className="flex items-end">
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 rounded-xl p-3 font-semibold text-white transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2"
+              className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl p-3 font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? "Searching..." : "🔍 Find Trains"}
             </button>
@@ -379,7 +383,7 @@ export default function Search() {
                   <button
                     onClick={() => startBooking(train)}
                     disabled={displayAvailable === 0}
-                    className="mt-3 w-full md:w-auto bg-green-600 hover:bg-green-700 disabled:bg-gray-700 px-6 py-2 rounded-xl text-sm font-semibold transition shadow-lg shadow-green-700/20"
+                    className="mt-3 w-full md:w-auto bg-white text-black hover:bg-zinc-200 disabled:bg-gray-700 px-6 py-2 rounded-xl text-sm font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
                   >
                     {displayAvailable === 0 ? "Sold Out" : "Book Ticket"}
                   </button>
@@ -388,7 +392,7 @@ export default function Search() {
 
               {/* Upgraded Multi-Passenger & Interactive Coach Drawer */}
               {booking === train._id && (
-                <div className="mt-5 border-t border-gray-800 pt-5 bg-gray-900/90 p-5 rounded-2xl border border-blue-500/30">
+                <div className="mt-5 border-t border-gray-800 pt-5 bg-gray-900/90 p-5 rounded-2xl border border-zinc-700">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
                     <div>
                       <h4 className="text-yellow-400 font-bold text-base">
@@ -573,7 +577,7 @@ export default function Search() {
                           });
                           router.push(`/payment?${query.toString()}`);
                         }}
-                        className="bg-green-600 hover:bg-green-700 px-6 py-2.5 rounded-xl font-bold text-sm text-white transition shadow-lg shadow-green-700/30"
+                        className="bg-white text-black hover:bg-zinc-200 px-6 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
                       >
                         Proceed to Checkout — ₹{totalFare}
                       </button>
@@ -593,7 +597,7 @@ export default function Search() {
             </p>
             <button
               onClick={fetchInitialTrains}
-              className="bg-blue-600 hover:bg-blue-700 px-6 py-2.5 rounded-xl font-semibold text-sm"
+              className="bg-white text-black hover:bg-zinc-200 px-6 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
             >
               Browse All Trains
             </button>

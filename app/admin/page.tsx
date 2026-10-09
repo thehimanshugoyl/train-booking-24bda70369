@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Admin() {
   const [trains, setTrains] = useState([]);
@@ -190,32 +191,33 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
       {/* Navbar */}
-      <nav className="flex justify-between items-center mb-8 bg-gray-800 rounded-xl p-4">
+      <nav className="flex flex-wrap justify-between items-center mb-8 bg-gray-800 rounded-xl p-4 gap-3">
         <Link href="/">
           <Logo size="sm" />
         </Link>
-        <div className="flex gap-2.5 items-center">
+        <div className="flex flex-wrap gap-2.5 items-center">
+          <ThemeToggle />
           <button
             onClick={handleSeedAllIndiaTrains}
             disabled={seedingMassive}
-            className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 disabled:opacity-50 px-3.5 py-2 rounded-lg text-xs font-bold transition shadow-lg shadow-orange-600/20"
+            className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 px-3.5 py-2 rounded-lg text-xs font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
           >
             {seedingMassive ? `⏳ ${massiveProgress}% Imported` : "⚡ Seed All 25,571 Trains"}
           </button>
           <button
             onClick={handleSeedDatabase}
             disabled={seeding}
-            className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 px-3 py-2 rounded-lg text-xs font-semibold transition hidden sm:inline-block"
+            className="bg-zinc-700 hover:bg-zinc-600 border border-zinc-600 disabled:opacity-50 px-3 py-2 rounded-lg text-xs font-semibold text-white transition hidden sm:inline-block"
           >
-            {seeding ? "⏳ Seeding..." : "🌱 Quick Sample (10+)"}
+            {seeding ? "⏳ Seeding..." : "🌱 Quick Sample (24+)"}
           </button>
-          <span className="text-gray-300 text-sm">👤 {user?.name}</span>
+          <span className="text-gray-300 text-sm hidden md:inline">👤 {user?.name}</span>
           <button
             onClick={() => {
               logout();
               router.push("/login");
             }}
-            className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm"
+            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-4 py-2 rounded-lg text-sm transition"
           >
             Logout
           </button>
@@ -224,18 +226,18 @@ export default function Admin() {
 
       {/* Massive 25,571 Trains Live Progress Banner */}
       {seedingMassive && (
-        <div className="bg-gradient-to-r from-orange-950/80 via-gray-900 to-amber-950/80 border border-orange-500/50 rounded-2xl p-5 mb-6 shadow-2xl animate-pulse">
+        <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 mb-6 shadow-2xl animate-pulse">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-bold text-orange-400 flex items-center gap-2">
+            <span className="text-sm font-bold text-white flex items-center gap-2">
               <span>⚡ Bulk Ingestion: 25,571 Indian Railways Trains</span>
             </span>
-            <span className="font-mono text-sm font-extrabold text-yellow-300">
+            <span className="font-mono text-sm font-extrabold text-amber-300">
               {massiveProgress}%
             </span>
           </div>
           <div className="w-full bg-gray-950 rounded-full h-3 overflow-hidden border border-gray-800 mb-2">
             <div
-              className="bg-gradient-to-r from-orange-500 to-amber-400 h-3 transition-all duration-300"
+              className="bg-white h-3 transition-all duration-300"
               style={{ width: `${Math.max(5, massiveProgress)}%` }}
             />
           </div>
@@ -244,7 +246,7 @@ export default function Admin() {
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 mb-6 bg-gray-800 rounded-xl p-2">
+      <div className="flex gap-2 mb-6 bg-gray-800 rounded-xl p-2 overflow-x-auto">
         {[
           { id: "stats", label: "📊 Statistics" },
           { id: "trains", label: "🚆 Fleet Management" },
@@ -255,9 +257,9 @@ export default function Admin() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
               activeTab === tab.id
-                ? "bg-blue-600 text-white"
+                ? "bg-white text-black shadow-md dark:bg-white dark:text-black light:bg-black light:text-white"
                 : "text-gray-400 hover:text-white hover:bg-gray-700"
             }`}
           >

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { generateTicketPdf } from "@/lib/ticketPdf";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
@@ -53,15 +54,18 @@ export default function Bookings() {
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
       {/* Navbar */}
-      <nav className="flex justify-between items-center mb-8 bg-gray-800 rounded-xl p-4">
+      <nav className="flex flex-wrap justify-between items-center mb-8 bg-gray-800 rounded-xl p-4 gap-3">
         <Link href="/">
           <Logo size="sm" />
         </Link>
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-wrap gap-3 items-center">
           <span className="text-gray-300 text-sm hidden sm:inline">Hello, {user?.name}</span>
+          
+          <ThemeToggle />
+
           <Link
             href="/pnr"
-            className="bg-gray-750 hover:bg-gray-700 text-yellow-300 border border-yellow-500/30 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition"
+            className="bg-gray-750 hover:bg-gray-700 text-zinc-200 border border-zinc-700 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition"
           >
             Track PNR
           </Link>
@@ -73,7 +77,7 @@ export default function Bookings() {
           </Link>
           <Link
             href="/search"
-            className="bg-blue-600 hover:bg-blue-700 px-3.5 py-1.5 rounded-lg text-sm font-medium transition"
+            className="bg-white text-black hover:bg-zinc-200 px-3.5 py-1.5 rounded-lg text-sm font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
           >
             🔍 Search Trains
           </Link>
@@ -82,7 +86,7 @@ export default function Bookings() {
               logout();
               router.push("/login");
             }}
-            className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm"
+            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-4 py-2 rounded-lg text-sm transition"
           >
             Logout
           </button>

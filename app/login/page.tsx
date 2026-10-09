@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import AnimatedTrainBackground from "@/components/AnimatedTrainBackground";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Login() {
   const [loginMethod, setLoginMethod] = useState<"password" | "otp">("password");
@@ -116,9 +117,12 @@ export default function Login() {
 
   return (
     <AnimatedTrainBackground>
-      <Link href="/" className="mb-6 transition-transform hover:scale-105">
-        <Logo size="lg" />
-      </Link>
+      <div className="flex items-center justify-between w-full max-w-md mb-6">
+        <Link href="/" className="transition-transform hover:scale-105">
+          <Logo size="md" />
+        </Link>
+        <ThemeToggle />
+      </div>
 
       <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl shadow-black/80 ring-1 ring-white/5">
         <h2 className="text-2xl font-bold text-white mb-1">Sign In to GADDVYA</h2>
@@ -137,7 +141,7 @@ export default function Login() {
             }}
             className={`flex-1 py-2 rounded-lg text-xs font-semibold transition ${
               loginMethod === "password"
-                ? "bg-blue-600 text-white shadow"
+                ? "bg-white text-black shadow-md dark:bg-white dark:text-black light:bg-black light:text-white"
                 : "text-gray-400 hover:text-white"
             }`}
           >
@@ -152,7 +156,7 @@ export default function Login() {
             }}
             className={`flex-1 py-2 rounded-lg text-xs font-semibold transition ${
               loginMethod === "otp"
-                ? "bg-blue-600 text-white shadow"
+                ? "bg-white text-black shadow-md dark:bg-white dark:text-black light:bg-black light:text-white"
                 : "text-gray-400 hover:text-white"
             }`}
           >
@@ -218,7 +222,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-blue-500 focus:outline-none"
+                className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-zinc-400 focus:outline-none"
                 placeholder="••••••••"
                 required
               />
@@ -227,7 +231,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-blue-600/30"
+              className="w-full bg-white text-black hover:bg-zinc-200 disabled:opacity-50 font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
             >
               {loading ? "Authenticating..." : "Sign In to GADDVYA"}
             </button>
@@ -247,7 +251,7 @@ export default function Login() {
                   disabled={otpSent}
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  className="flex-1 bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-blue-500 focus:outline-none disabled:opacity-60"
+                  className="flex-1 bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-zinc-400 focus:outline-none disabled:opacity-60"
                   placeholder="user@railx.com or 9876543210"
                   required
                 />
@@ -255,7 +259,7 @@ export default function Login() {
                   type="button"
                   onClick={handleSendLoginOtp}
                   disabled={loading || otpTimer > 0}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs px-4 rounded-xl font-bold transition whitespace-nowrap"
+                  className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 text-xs px-4 rounded-xl font-bold transition whitespace-nowrap dark:bg-white dark:text-black light:bg-black light:text-white"
                 >
                   {otpTimer > 0 ? `Resend (${otpTimer}s)` : otpSent ? "Resend" : "Send OTP"}
                 </button>
@@ -263,13 +267,13 @@ export default function Login() {
             </div>
 
             {previewOtp && (
-              <div className="bg-blue-950/70 border border-blue-500/40 p-2.5 rounded-xl flex justify-between items-center text-xs">
-                <span className="text-blue-300">⚡ Dev Preview Code:</span>
-                <span className="font-mono font-bold text-yellow-300 text-base">{previewOtp}</span>
+              <div className="bg-zinc-850 border border-zinc-700 p-2.5 rounded-xl flex justify-between items-center text-xs">
+                <span className="text-zinc-300">⚡ Dev Preview Code:</span>
+                <span className="font-mono font-bold text-amber-300 text-base">{previewOtp}</span>
                 <button
                   type="button"
                   onClick={() => setOtp(previewOtp)}
-                  className="bg-blue-600 px-2 py-0.5 rounded text-white text-[11px]"
+                  className="bg-zinc-700 hover:bg-zinc-600 px-2 py-0.5 rounded text-white text-[11px] font-semibold"
                 >
                   Auto-Fill
                 </button>
@@ -297,7 +301,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading || otp.length !== 6}
-                className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-green-700/30"
+                className="w-full bg-white text-black hover:bg-zinc-200 disabled:opacity-50 font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
               >
                 {loading ? "Verifying..." : "Verify OTP & Sign In"}
               </button>
@@ -307,7 +311,7 @@ export default function Login() {
 
         <p className="text-gray-400 text-xs text-center mt-6 border-t border-gray-800 pt-4">
           Don&apos;t have an account yet?{" "}
-          <Link href="/register" className="text-blue-400 font-semibold hover:underline">
+          <Link href="/register" className="text-zinc-200 dark:text-zinc-200 light:text-zinc-900 font-bold hover:underline">
             Register New Account
           </Link>
         </p>

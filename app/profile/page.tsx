@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function ProfilePage() {
   const { user, token, logout } = useAuthStore();
@@ -36,14 +37,15 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white p-4 md:p-8">
       {/* Top Navbar */}
-      <nav className="max-w-5xl mx-auto flex justify-between items-center mb-8 bg-gray-900/80 border border-gray-800 rounded-2xl p-4 backdrop-blur-md">
+      <nav className="max-w-5xl mx-auto flex flex-wrap justify-between items-center mb-8 bg-gray-900/80 border border-gray-800 rounded-2xl p-4 backdrop-blur-md gap-3">
         <Link href="/">
           <Logo size="sm" />
         </Link>
-        <div className="flex gap-2 sm:gap-3 items-center">
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
+          <ThemeToggle />
           <Link
             href="/search"
-            className="bg-gray-800 hover:bg-gray-750 text-gray-200 border border-gray-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition"
+            className="bg-white text-black hover:bg-zinc-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
           >
             🔍 Search Trains
           </Link>
@@ -58,7 +60,7 @@ export default function ProfilePage() {
               logout();
               router.push("/login");
             }}
-            className="bg-red-600/90 hover:bg-red-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition"
+            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition"
           >
             Logout
           </button>
@@ -68,16 +70,16 @@ export default function ProfilePage() {
       {/* Main Container */}
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header Card */}
-        <div className="bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-purple-900/20 border border-blue-500/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+        <div className="bg-gray-900 border border-zinc-700/80 rounded-3xl p-6 sm:p-8 relative overflow-hidden">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-3xl font-bold shadow-lg shadow-blue-500/30">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-3xl font-bold shadow-lg shadow-black/30 text-white">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white">{user.name}</h2>
-                  <span className="text-[11px] bg-blue-500/20 border border-blue-400/40 text-blue-300 font-semibold px-2 py-0.5 rounded-full capitalize">
+                  <span className="text-[11px] bg-zinc-800 border border-zinc-650 text-zinc-300 font-semibold px-2 py-0.5 rounded-full capitalize">
                     {user.role}
                   </span>
                 </div>
