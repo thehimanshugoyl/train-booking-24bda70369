@@ -5,7 +5,16 @@ interface User {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   role: string;
+  isEmailVerified?: boolean;
+  isPhoneVerified?: boolean;
+  gender?: string;
+  dob?: string;
+  state?: string;
+  city?: string;
+  idProofType?: string;
+  idProofNumber?: string;
 }
 
 interface AuthStore {

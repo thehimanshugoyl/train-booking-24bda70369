@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <!-- Deep Forest Teal Squircle Badge -->
+  <rect x="10" y="10" width="140" height="140" rx="36" fill="#173e33" />
+  
+  <!-- Subtle inner gradient ring -->
+  <rect x="10" y="10" width="140" height="140" rx="36" fill="none" stroke="#22594a" stroke-width="2" />
+
+  <!-- Gold Minimalist Bullet Train Emblem -->
+  <g transform="translate(80, 80) scale(1.4) translate(-50, -50)">
+    <!-- Aerodynamic Locomotive Hull -->
+    <path 
+      d="M34,55 C34,35 38,24 50,24 C62,24 66,35 66,55 C66,63 61,66 50,66 C39,66 34,63 34,55 Z" 
+      fill="none" 
+      stroke="#eec574" 
+      stroke-width="3" 
+      stroke-linecap="round" 
+      stroke-linejoin="round"
+    />
+    
+    <!-- Top Windshield Glass -->
+    <path 
+      d="M42,37 C42,31 45,29 50,29 C55,29 58,31 58,37 C58,45 55,47 50,47 C45,47 42,45 42,37 Z" 
+      fill="none" 
+      stroke="#eec574" 
+      stroke-width="2.5" 
+      stroke-linecap="round" 
+      stroke-linejoin="round"
+    />
+    
+    <!-- Left & Right Headlights -->
+    <ellipse cx="42" cy="54" rx="2" ry="1.6" transform="rotate(-15 42 54)" fill="#eec574" />
+    <ellipse cx="58" cy="54" rx="2" ry="1.6" transform="rotate(15 58 54)" fill="#eec574" />
+    
+    <!-- Under-chassis Base Track Runner & Cowcatcher -->
+    <path 
+      d="M40,66 L35,76 M60,66 L65,76" 
+      stroke="#eec574" 
+      stroke-width="3" 
+      stroke-linecap="round"
+    />
+    <path 
+      d="M34,73 C44,71.5 56,71.5 66,73" 
+      stroke="#eec574" 
+      stroke-width="2.5" 
+      stroke-linecap="round"
+    />
+  </g>
+</svg>
