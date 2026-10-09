@@ -7,9 +7,7 @@ import { useWalletStore } from "@/store/useWalletStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { generateTicketPdf } from "@/lib/ticketPdf";
-import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
-import LanguageSelector from "@/components/LanguageSelector";
+import IrctcNavBar from "@/components/IrctcNavBar";
 
 export default function Bookings() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -61,53 +59,11 @@ export default function Bookings() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6">
-      {/* Navbar */}
-      <nav className="flex flex-wrap justify-between items-center mb-8 bg-gray-800 rounded-2xl p-4 gap-3 border border-gray-700/60 shadow-lg">
-        <Link href="/">
-          <Logo size="sm" />
-        </Link>
-        <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
-          <span className="text-gray-300 text-sm hidden sm:inline">Hello, {user?.name}</span>
-          
-          <LanguageSelector />
-          <ThemeToggle />
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col transition-colors">
+      {/* Official IRCTC Navigation Bar */}
+      <IrctcNavBar />
 
-          <Link
-            href="/wallet"
-            className="text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs font-bold transition flex items-center gap-1.5"
-          >
-            <span>💳</span> {t("wallet")}
-          </Link>
-          <Link
-            href="/pnr"
-            className="bg-gray-750 hover:bg-gray-750 text-zinc-200 border border-zinc-700 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition"
-          >
-            {t("pnrStatus")}
-          </Link>
-          <Link
-            href="/profile"
-            className="bg-gray-700 hover:bg-gray-650 px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5"
-          >
-            <span>👤</span> {t("profile")}
-          </Link>
-          <Link
-            href="/search"
-            className="bg-white text-black hover:bg-zinc-200 px-3.5 py-1.5 rounded-lg text-sm font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
-          >
-            🔍 {t("searchTrains")}
-          </Link>
-          <button
-            onClick={() => {
-              logout();
-              router.push("/login");
-            }}
-            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3.5 py-1.5 rounded-lg text-sm transition cursor-pointer"
-          >
-            {t("logout")}
-          </button>
-        </div>
-      </nav>
+      <main className="max-w-6xl mx-auto w-full p-4 md:p-6 flex-1">
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
         <div>
@@ -245,6 +201,7 @@ export default function Bookings() {
           ))}
         </div>
       )}
+      </main>
     </div>
   );
 }

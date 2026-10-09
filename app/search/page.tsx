@@ -6,9 +6,8 @@ import { useLanguageStore } from "@/store/useLanguageStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import CoachSeatPicker from "@/components/CoachSeatPicker";
-import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
-import LanguageSelector from "@/components/LanguageSelector";
+import IrctcNavBar from "@/components/IrctcNavBar";
+import TatkalCountdownWidget from "@/components/TatkalCountdownWidget";
 
 interface PassengerItem {
   name: string;
@@ -136,61 +135,11 @@ export default function Search() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-6">
-      {/* Navbar */}
-      <nav className="flex flex-wrap justify-between items-center mb-8 bg-gray-850 border border-gray-800 rounded-2xl p-4 shadow-lg gap-3">
-        <Link href="/">
-          <Logo size="sm" />
-        </Link>
-        <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
-          <span className="text-gray-300 text-sm hidden md:inline">Hello, {user?.name}</span>
-          
-          <LanguageSelector />
-          <ThemeToggle />
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col transition-colors">
+      {/* Official IRCTC Navigation Bar */}
+      <IrctcNavBar />
 
-          <Link
-            href="/wallet"
-            className="text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs font-bold transition flex items-center gap-1.5"
-          >
-            <span>💳</span> {t("wallet")}
-          </Link>
-          <Link
-            href="/pnr"
-            className="bg-gray-800 hover:bg-gray-750 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-lg text-sm font-semibold transition"
-          >
-            {t("pnrStatus")}
-          </Link>
-          {user?.role === "admin" && (
-            <Link
-              href="/admin"
-              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition"
-            >
-              ⚙️ {t("admin")}
-            </Link>
-          )}
-          <Link
-            href="/profile"
-            className="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5"
-          >
-            <span>👤</span> {t("profile")}
-          </Link>
-          <Link
-            href="/bookings"
-            className="bg-gray-800 hover:bg-gray-750 border border-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium transition"
-          >
-            🎫 {t("myBookings")}
-          </Link>
-          <button
-            onClick={() => {
-              logout();
-              router.push("/login");
-            }}
-            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer"
-          >
-            {t("logout")}
-          </button>
-        </div>
-      </nav>
+      <main className="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1">
 
       {/* Search Header Banner */}
       <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 mb-6 border border-white/10 shadow-2xl bg-gray-900">
@@ -283,6 +232,11 @@ export default function Search() {
           </div>
         </form>
         </div>
+      </div>
+
+      {/* Live Tatkal Countdown Widget */}
+      <div className="mb-6">
+        <TatkalCountdownWidget />
       </div>
 
       {/* Train Results List */}
@@ -621,6 +575,7 @@ export default function Search() {
           </div>
         )}
       </div>
+      </main>
     </div>
   );
 }

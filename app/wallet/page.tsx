@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
-import LanguageSelector from "@/components/LanguageSelector";
+import IrctcNavBar from "@/components/IrctcNavBar";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useWalletStore } from "@/store/useWalletStore";
 import { useLanguageStore } from "@/store/useLanguageStore";
@@ -54,35 +52,11 @@ export default function WalletPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-8">
-      {/* Top Navbar */}
-      <nav className="max-w-6xl mx-auto flex flex-wrap justify-between items-center mb-8 bg-gray-900/80 border border-gray-800 rounded-2xl p-4 backdrop-blur-md gap-3 shadow-lg">
-        <Link href="/">
-          <Logo size="sm" />
-        </Link>
-        <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
-          <LanguageSelector />
-          <ThemeToggle />
-          <Link
-            href="/search"
-            className="bg-gray-800 hover:bg-gray-750 text-gray-200 border border-gray-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition"
-          >
-            🔍 {t("searchTrains")}
-          </Link>
-          <Link
-            href="/bookings"
-            className="bg-gray-800 hover:bg-gray-750 text-gray-200 border border-gray-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition"
-          >
-            🎫 {t("myBookings")}
-          </Link>
-          <Link
-            href="/profile"
-            className="bg-gray-800 hover:bg-gray-750 text-gray-200 border border-gray-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition"
-          >
-            👤 {t("profile")}
-          </Link>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col transition-colors">
+      {/* Official IRCTC Navigation Bar */}
+      <IrctcNavBar />
+
+      <main className="max-w-6xl mx-auto w-full p-4 md:p-8 flex-1">
 
       {/* Main Content Container */}
       <div className="max-w-6xl mx-auto space-y-8">
@@ -430,6 +404,7 @@ export default function WalletPage() {
           )}
         </div>
       </div>
+      </main>
     </div>
   );
 }

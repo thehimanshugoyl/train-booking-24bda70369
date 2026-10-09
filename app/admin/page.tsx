@@ -4,10 +4,8 @@ import axios from "axios";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
-import LanguageSelector from "@/components/LanguageSelector";
 import AdminCharts from "@/components/AdminCharts";
+import IrctcNavBar from "@/components/IrctcNavBar";
 
 export default function Admin() {
   const [trains, setTrains] = useState([]);
@@ -142,6 +140,20 @@ export default function Admin() {
     }
   };
 
+  const handleTurboSeed = async () => {
+    setSeeding(true);
+    try {
+      const res = await axios.post("/api/admin/seed-massive?mode=turbo");
+      alert(res.data.message || "Turbo fleet seeded instantly in under 1 second!");
+      fetchTrains();
+      fetchStats();
+    } catch (err: any) {
+      alert("Turbo seed error: " + (err.response?.data?.error || err.message));
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   const handleSeedAllIndiaTrains = async () => {
     if (
       !confirm(
@@ -152,13 +164,13 @@ export default function Admin() {
 
     setSeedingMassive(true);
     setMassiveProgress(5);
-    setMassiveStatus("Initializing bulk ingestion of 25,571 daily trains...");
+    setMassiveStatus("Initializing bulk ingestion of 25,571 daily trains in fast batches...");
 
     try {
       let isDone = false;
       while (!isDone) {
         const res = await axios.post(
-          "/api/admin/seed-massive?batchSize=3500&target=25571"
+          "/api/admin/seed-massive?batchSize=500&target=25571"
         );
         const prog = res.data.progress || 0;
         setMassiveProgress(prog);
@@ -180,41 +192,47 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6">
-      {/* Navbar */}
-      <nav className="flex flex-wrap justify-between items-center mb-8 bg-gray-800 rounded-xl p-4 gap-3">
-        <Link href="/">
-          <Logo size="sm" />
-        </Link>
-        <div className="flex flex-wrap gap-2.5 items-center">
-          <LanguageSelector />
-          <ThemeToggle />
-          <button
-            onClick={handleSeedAllIndiaTrains}
-            disabled={seedingMassive}
-            className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 px-3.5 py-2 rounded-lg text-xs font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
-          >
-            {seedingMassive ? `⏳ ${massiveProgress}% Imported` : "⚡ Seed All 25,571 Trains"}
-          </button>
-          <button
-            onClick={handleSeedDatabase}
-            disabled={seeding}
-            className="bg-zinc-700 hover:bg-zinc-600 border border-zinc-600 disabled:opacity-50 px-3 py-2 rounded-lg text-xs font-semibold text-white transition hidden sm:inline-block"
-          >
-            {seeding ? "⏳ Seeding..." : "🌱 Quick Sample (24+)"}
-          </button>
-          <span className="text-gray-300 text-sm hidden md:inline">👤 {user?.name}</span>
-          <button
-            onClick={() => {
-              logout();
-              router.push("/login");
-            }}
-            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-4 py-2 rounded-lg text-sm transition"
-          >
-            Logout
-          </button>
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between">
+      {/* Authentic IRCTC Top Navbar Suite */}
+      <IrctcNavBar />
+
+      <div className="max-w-7xl mx-auto w-full p-4 sm:p-6 flex-1">
+        {/* Fast Action Seeding Command Strip */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-6 shadow-xl flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <span className="text-xs font-mono text-purple-400 uppercase tracking-widest font-bold block">
+              Admin Fleet Controller
+            </span>
+            <p className="text-sm font-bold text-white">Database Fleet Ingestion & Pre-Compiler</p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 items-center">
+            {/* Blazing Fast 1-Click Turbo Button */}
+            <button
+              onClick={handleTurboSeed}
+              disabled={seeding || seedingMassive}
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-extrabold px-4 py-2 rounded-xl text-xs shadow-lg transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              <span>🚀 Turbo Fleet (400+ Instant ~1s)</span>
+            </button>
+
+            <button
+              onClick={handleSeedAllIndiaTrains}
+              disabled={seedingMassive}
+              className="bg-white text-black hover:bg-slate-200 disabled:opacity-50 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-md cursor-pointer"
+            >
+              {seedingMassive ? `⏳ ${massiveProgress}% Full Ingestion` : "⚡ Ingest Full 25,571 Trains"}
+            </button>
+
+            <button
+              onClick={handleSeedDatabase}
+              disabled={seeding}
+              className="bg-slate-800 hover:bg-slate-700 border border-slate-700 disabled:opacity-50 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 transition cursor-pointer"
+            >
+              {seeding ? "⏳ Seeding..." : "🌱 Sample (24+)"}
+            </button>
+          </div>
         </div>
-      </nav>
 
       {/* Massive 25,571 Trains Live Progress Banner */}
       {seedingMassive && (
@@ -710,6 +728,7 @@ export default function Admin() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

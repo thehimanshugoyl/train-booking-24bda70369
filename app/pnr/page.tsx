@@ -3,9 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { generateTicketPdf } from "@/lib/ticketPdf";
-import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
-import LanguageSelector from "@/components/LanguageSelector";
+import IrctcNavBar from "@/components/IrctcNavBar";
 
 export default function PnrPage() {
   const [pnr, setPnr] = useState("");
@@ -33,29 +31,9 @@ export default function PnrPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-6 flex flex-col justify-between">
-      {/* Navbar */}
-      <nav className="flex justify-between items-center mb-8 bg-gray-850 border border-gray-800 rounded-2xl p-4 shadow-lg max-w-6xl mx-auto w-full gap-3">
-        <Link href="/">
-          <Logo size="sm" />
-        </Link>
-        <div className="flex items-center gap-3">
-          <LanguageSelector />
-          <ThemeToggle />
-          <Link
-            href="/search"
-            className="bg-white text-black hover:bg-zinc-200 px-4 py-2 rounded-xl text-sm font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
-          >
-            🔍 Search Trains
-          </Link>
-          <Link
-            href="/login"
-            className="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-4 py-2 rounded-xl text-sm font-medium transition"
-          >
-            Login
-          </Link>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between transition-colors">
+      {/* Official IRCTC Navigation Bar */}
+      <IrctcNavBar />
 
       {/* Main Container */}
       <main className="max-w-3xl mx-auto w-full my-auto">

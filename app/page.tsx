@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
-import LanguageSelector from "@/components/LanguageSelector";
+import IrctcNavBar from "@/components/IrctcNavBar";
+import TatkalCountdownWidget from "@/components/TatkalCountdownWidget";
+import LiveTrainTrackerModal from "@/components/LiveTrainTrackerModal";
+import ECateringModal from "@/components/ECateringModal";
+import RailAlertsModal from "@/components/RailAlertsModal";
 import { useLanguageStore } from "@/store/useLanguageStore";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -11,74 +14,19 @@ export default function Home() {
   const { t } = useLanguageStore();
   const { user } = useAuthStore();
 
+  const [showLiveTracker, setShowLiveTracker] = useState(false);
+  const [showECatering, setShowECatering] = useState(false);
+  const [showAlerts, setShowAlerts] = useState(false);
+
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between transition-colors">
-      {/* Navigation Bar */}
-      <header className="border-b border-gray-850 bg-gray-900/60 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-4">
-          <Link href="/">
-            <Logo size="md" />
-          </Link>
-
-          <nav className="flex items-center gap-2 sm:gap-3">
-            <Link
-              href="/search"
-              className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
-            >
-              {t("searchTrains")}
-            </Link>
-            <Link
-              href="/pnr"
-              className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition hidden md:inline-block"
-            >
-              {t("pnrStatus")}
-            </Link>
-            <Link
-              href="/wallet"
-              className="text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs font-bold transition flex items-center gap-1.5"
-            >
-              <span>💳</span> {t("wallet")}
-            </Link>
-
-            {/* Language Selector (English / Hindi / Punjabi) */}
-            <LanguageSelector />
-
-            {/* Black / White Theme Switcher */}
-            <ThemeToggle />
-
-            <div className="h-5 w-[1px] bg-gray-800 mx-1 hidden sm:block"></div>
-
-            {user ? (
-              <Link
-                href="/profile"
-                className="bg-white text-black hover:bg-zinc-200 px-4 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
-              >
-                👤 {user.name}
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="text-gray-200 hover:text-white bg-gray-800/80 hover:bg-gray-700/80 border border-gray-750 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition"
-                >
-                  {t("login")}
-                </Link>
-                <Link
-                  href="/register"
-                  className="bg-white text-black hover:bg-zinc-200 px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
-                >
-                  {t("register")}
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
+      {/* IRCTC-Style Official Navigation Bar */}
+      <IrctcNavBar />
 
       {/* Hero Section */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 py-16 w-full flex flex-col items-center justify-center text-center">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full flex flex-col items-center justify-center text-center">
         {/* Release Pill */}
-        <div className="inline-flex items-center gap-2 bg-zinc-900/80 border border-zinc-750 px-4 py-1.5 rounded-full mb-8 shadow-sm">
+        <div className="inline-flex items-center gap-2 bg-zinc-900/80 border border-zinc-750 px-4 py-1.5 rounded-full mb-6 shadow-sm">
           <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span className="text-xs text-zinc-300 font-medium">
             {t("heroPill")}
@@ -86,46 +34,131 @@ export default function Home() {
         </div>
 
         {/* Hero Title */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6 max-w-4xl leading-tight">
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-4 max-w-4xl leading-tight">
           {t("heroTitle1")} <br />
-          <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent dark:from-white dark:via-zinc-200 dark:to-zinc-400 light:from-black light:via-zinc-800 light:to-zinc-600">
+          <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent dark:from-white dark:via-zinc-200 dark:to-zinc-400 light:from-blue-700 light:via-indigo-800 light:to-sky-700">
             {t("heroTitle2")}
           </span>
         </h1>
 
-        <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mb-10 leading-relaxed">
+        <p className="text-gray-400 text-base sm:text-xl max-w-2xl mb-8 leading-relaxed">
           {t("heroSubtitle")}
         </p>
 
+        {/* Live Tatkal Countdown Banner Widget */}
+        <div className="w-full max-w-4xl mb-8">
+          <TatkalCountdownWidget />
+        </div>
+
         {/* CTA Buttons */}
-        <div className="flex flex-wrap gap-4 justify-center mb-16">
+        <div className="flex flex-wrap gap-3 sm:gap-4 justify-center mb-12">
           <Link
             href="/search"
-            className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 rounded-2xl font-bold text-lg transition shadow-xl shadow-white/10 flex items-center gap-2 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-8 py-3.5 rounded-2xl font-bold text-base sm:text-lg transition shadow-xl shadow-blue-600/20 flex items-center gap-2 cursor-pointer"
           >
-            <span>{t("searchBtn")}</span>
+            <span>🔍 {t("searchBtn")}</span>
           </Link>
+          <button
+            onClick={() => setShowLiveTracker(true)}
+            className="bg-slate-900 hover:bg-slate-800 text-blue-300 border border-blue-500/40 px-6 py-3.5 rounded-2xl font-semibold text-base sm:text-lg transition flex items-center gap-2 cursor-pointer shadow-lg"
+          >
+            <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
+            <span>📡 Live Running Status</span>
+          </button>
+          <button
+            onClick={() => setShowECatering(true)}
+            className="bg-amber-950/60 hover:bg-amber-900/60 text-amber-200 border border-amber-700/60 px-6 py-3.5 rounded-2xl font-semibold text-base sm:text-lg transition flex items-center gap-2 cursor-pointer shadow-lg"
+          >
+            <span>🍱 e-Catering Meals</span>
+          </button>
           <Link
             href="/wallet"
-            className="bg-amber-950/60 hover:bg-amber-900/60 text-amber-200 border border-amber-700/60 px-7 py-3.5 rounded-2xl font-semibold text-lg transition flex items-center gap-2"
+            className="bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/40 px-6 py-3.5 rounded-2xl font-semibold text-base sm:text-lg transition flex items-center gap-2 cursor-pointer"
           >
             <span>💳 {t("wallet")}</span>
           </Link>
           <Link
-            href="/register"
-            className="bg-gray-850 hover:bg-gray-800 text-gray-200 border border-gray-750 px-8 py-3.5 rounded-2xl font-semibold text-lg transition flex items-center gap-2"
-          >
-            <span>{t("createAccountBtn")}</span>
-          </Link>
-          <Link
             href="/pnr"
-            className="bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-800 px-6 py-3.5 rounded-2xl font-semibold text-lg transition flex items-center gap-2"
+            className="bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-800 px-6 py-3.5 rounded-2xl font-semibold text-base sm:text-lg transition flex items-center gap-2 cursor-pointer"
           >
-            <span>{t("pnrBtn")}</span>
+            <span>🎫 {t("pnrBtn")}</span>
           </Link>
         </div>
 
         {/* Key Features Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full text-left mt-2">
+          <div
+            onClick={() => setShowLiveTracker(true)}
+            className="bg-slate-900/70 border border-slate-800 hover:border-blue-500/50 p-5 rounded-2xl transition cursor-pointer hover:bg-slate-850/80 group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-2xl">📡</span>
+              <span className="text-[10px] font-bold bg-blue-900/60 text-blue-300 px-2 py-0.5 rounded-full border border-blue-700/50">
+                GPS LIVE
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-white group-hover:text-blue-300 transition mb-1">
+              Live GPS Tracking
+            </h3>
+            <p className="text-gray-400 text-xs leading-relaxed">
+              Real-time speed, platform numbers, upcoming station progress and exact delay calculation.
+            </p>
+          </div>
+
+          <div
+            onClick={() => setShowECatering(true)}
+            className="bg-slate-900/70 border border-slate-800 hover:border-amber-500/50 p-5 rounded-2xl transition cursor-pointer hover:bg-slate-850/80 group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-2xl">🍱</span>
+              <span className="text-[10px] font-bold bg-amber-900/60 text-amber-300 px-2 py-0.5 rounded-full border border-amber-700/50">
+                BERTH DELIVERY
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition mb-1">
+              e-Catering Meals
+            </h3>
+            <p className="text-gray-400 text-xs leading-relaxed">
+              Order fresh Thalis, Jain Satvik, Biryani & Domino's pizza delivered right to your berth.
+            </p>
+          </div>
+
+          <div
+            onClick={() => setShowAlerts(true)}
+            className="bg-slate-900/70 border border-slate-800 hover:border-red-500/50 p-5 rounded-2xl transition cursor-pointer hover:bg-slate-850/80 group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-2xl">🚨</span>
+              <span className="text-[10px] font-bold bg-red-900/60 text-red-300 px-2 py-0.5 rounded-full border border-red-700/50">
+                CRITICAL
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-white group-hover:text-red-300 transition mb-1">
+              Fog & Rail Advisories
+            </h3>
+            <p className="text-gray-400 text-xs leading-relaxed">
+              Winter fog delays, rescheduled routes, track maintenance blocks, and festival specials.
+            </p>
+          </div>
+
+          <Link
+            href="/wallet"
+            className="bg-slate-900/70 border border-slate-800 hover:border-emerald-500/50 p-5 rounded-2xl transition cursor-pointer hover:bg-slate-850/80 group block"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-2xl">⚡</span>
+              <span className="text-[10px] font-bold bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700/50">
+                INSTANT
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition mb-1">
+              GADDVYA Rail Wallet
+            </h3>
+            <p className="text-gray-400 text-xs leading-relaxed">
+              1-Click Tatkal checkout, zero bank gateway dropouts, and 100% instant ticket refund.
+            </p>
+          </Link>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left mt-4">
           <div className="bg-gray-900/60 border border-gray-800 p-6 rounded-2xl hover:border-gray-700 transition">
             <div className="text-3xl mb-3">🇮🇳</div>
@@ -264,6 +297,26 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Modals for Live Tracker, e-Catering & Rail Alerts */}
+      {showLiveTracker && (
+        <LiveTrainTrackerModal
+          isOpen={showLiveTracker}
+          onClose={() => setShowLiveTracker(false)}
+        />
+      )}
+      {showECatering && (
+        <ECateringModal
+          isOpen={showECatering}
+          onClose={() => setShowECatering(false)}
+        />
+      )}
+      {showAlerts && (
+        <RailAlertsModal
+          isOpen={showAlerts}
+          onClose={() => setShowAlerts(false)}
+        />
+      )}
     </div>
   );
 }

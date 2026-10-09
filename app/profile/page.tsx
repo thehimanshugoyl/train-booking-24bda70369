@@ -4,9 +4,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
-import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
-import LanguageSelector from "@/components/LanguageSelector";
+import IrctcNavBar from "@/components/IrctcNavBar";
 import { useLanguageStore } from "@/store/useLanguageStore";
 import { useWalletStore } from "@/store/useWalletStore";
 
@@ -40,45 +38,11 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-8">
-      {/* Top Navbar */}
-      <nav className="max-w-5xl mx-auto flex flex-wrap justify-between items-center mb-8 bg-gray-900/80 border border-gray-800 rounded-2xl p-4 backdrop-blur-md gap-3">
-        <Link href="/">
-          <Logo size="sm" />
-        </Link>
-        <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
-          <LanguageSelector />
-          <ThemeToggle />
-          <Link
-            href="/wallet"
-            className="text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs font-bold transition flex items-center gap-1.5"
-          >
-            <span>💳</span> {t("wallet")}
-          </Link>
-          <Link
-            href="/search"
-            className="bg-white text-black hover:bg-zinc-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
-          >
-            🔍 {t("searchTrains")}
-          </Link>
-          <Link
-            href="/bookings"
-            className="bg-gray-800 hover:bg-gray-750 text-gray-200 border border-gray-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition"
-          >
-            🎫 {t("myBookings")}
-          </Link>
-          <button
-            onClick={() => {
-              logout();
-              router.push("/login");
-            }}
-            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer"
-          >
-            {t("logout")}
-          </button>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col transition-colors">
+      {/* Official IRCTC Navigation Bar */}
+      <IrctcNavBar />
 
+      <main className="max-w-5xl mx-auto w-full p-4 md:p-8 flex-1">
       {/* Main Container */}
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header Card */}
@@ -252,6 +216,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      </main>
     </div>
   );
 }
