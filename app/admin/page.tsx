@@ -7,6 +7,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageSelector from "@/components/LanguageSelector";
+import AdminCharts from "@/components/AdminCharts";
 
 export default function Admin() {
   const [trains, setTrains] = useState([]);
@@ -17,6 +18,7 @@ export default function Admin() {
   const [massiveProgress, setMassiveProgress] = useState(0);
   const [massiveStatus, setMassiveStatus] = useState("");
   const [stats, setStats] = useState<any>(null);
+  const [chartsData, setChartsData] = useState<any>(null);
   const [recentBookings, setRecentBookings] = useState([]);
   const [recentUsers, setRecentUsers] = useState([]);
   const [form, setForm] = useState({
@@ -56,6 +58,7 @@ export default function Admin() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStats(res.data.stats);
+      setChartsData(res.data.charts);
       setRecentBookings(res.data.recentBookings || []);
       setRecentUsers(res.data.recentUsers || []);
     } catch (err) {
@@ -176,19 +179,6 @@ export default function Admin() {
     }
   };
 
-  const StatCard = ({ icon, label, value, sub, color }: any) => (
-    <div className={`bg-gray-800 rounded-xl p-5 border-l-4 ${color}`}>
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="text-gray-400 text-sm mb-1">{label}</p>
-          <p className="text-3xl font-bold text-white">{value}</p>
-          {sub && <p className="text-gray-500 text-xs mt-1">{sub}</p>}
-        </div>
-        <span className="text-3xl">{icon}</span>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
       {/* Navbar */}
@@ -287,67 +277,23 @@ export default function Admin() {
             <p className="text-gray-400 text-center py-10">Loading statistics...</p>
           ) : (
             <>
-              {/* Main Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <StatCard
-                  icon="👥"
-                  label="Total Users"
-                  value={stats?.totalUsers || 0}
-                  sub="Registered accounts"
-                  color="border-blue-500"
-                />
-                <StatCard
-                  icon="🚆"
-                  label="Total Trains"
-                  value={stats?.totalTrains || 0}
-                  sub="Active routes scheduled"
-                  color="border-green-500"
-                />
-                <StatCard
-                  icon="🎫"
-                  label="Total Bookings"
-                  value={stats?.totalBookings || 0}
-                  sub={`${stats?.confirmedBookings || 0} confirmed`}
-                  color="border-yellow-500"
-                />
-                <StatCard
-                  icon="💰"
-                  label="Total Revenue"
-                  value={`₹${(stats?.totalRevenue || 0).toLocaleString("en-IN")}`}
-                  sub="From confirmed bookings"
-                  color="border-purple-500"
-                />
-              </div>
-
-              {/* Secondary Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <StatCard
-                  icon="✅"
-                  label="Confirmed"
-                  value={stats?.confirmedBookings || 0}
-                  sub="Active bookings"
-                  color="border-green-500"
-                />
-                <StatCard
-                  icon="❌"
-                  label="Cancelled"
-                  value={stats?.cancelledBookings || 0}
-                  sub="Cancelled bookings"
-                  color="border-red-500"
-                />
-                <StatCard
-                  icon="🌐"
-                  label="Total Visits"
-                  value={stats?.totalVisits || 0}
-                  sub="All time site visits"
-                  color="border-cyan-500"
-                />
-                <StatCard
-                  icon="📅"
-                  label="Today's Visits"
-                  value={stats?.todayVisits || 0}
-                  sub="Visits today"
-                  color="border-orange-500"
+              {/* Rich Analytics Charts (Area Trend, Donut Breakdown, Route Occupancy) */}
+              <div className="mb-8">
+                <AdminCharts
+                  stats={
+                    stats || {
+                      totalUsers: 0,
+                      totalTrains: 0,
+                      totalBookings: 0,
+                      confirmedBookings: 0,
+                      cancelledBookings: 0,
+                      totalRevenue: 0,
+                      totalVisits: 0,
+                      todayVisits: 0,
+                    }
+                  }
+                  charts={chartsData}
+                  onRefresh={fetchStats}
                 />
               </div>
 
