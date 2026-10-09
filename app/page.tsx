@@ -1,8 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSelector from "@/components/LanguageSelector";
+import { useLanguageStore } from "@/store/useLanguageStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function Home() {
+  const { t } = useLanguageStore();
+  const { user } = useAuthStore();
+
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between transition-colors">
       {/* Navigation Bar */}
@@ -12,36 +20,57 @@ export default function Home() {
             <Logo size="md" />
           </Link>
 
-          <nav className="flex items-center gap-2 sm:gap-4">
+          <nav className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/search"
               className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition"
             >
-              Search Trains
+              {t("searchTrains")}
             </Link>
             <Link
               href="/pnr"
-              className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition hidden sm:inline-block"
+              className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition hidden md:inline-block"
             >
-              PNR Status
+              {t("pnrStatus")}
             </Link>
-            
+            <Link
+              href="/wallet"
+              className="text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs font-bold transition flex items-center gap-1.5"
+            >
+              <span>💳</span> {t("wallet")}
+            </Link>
+
+            {/* Language Selector (English / Hindi / Punjabi) */}
+            <LanguageSelector />
+
             {/* Black / White Theme Switcher */}
             <ThemeToggle />
 
             <div className="h-5 w-[1px] bg-gray-800 mx-1 hidden sm:block"></div>
-            <Link
-              href="/login"
-              className="text-gray-200 hover:text-white bg-gray-800/80 hover:bg-gray-700/80 border border-gray-750 px-4 py-2 rounded-xl text-sm font-medium transition"
-            >
-              Login
-            </Link>
-            <Link
-              href="/register"
-              className="bg-white text-black hover:bg-zinc-200 px-5 py-2 rounded-xl text-sm font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
-            >
-              Get Started
-            </Link>
+
+            {user ? (
+              <Link
+                href="/profile"
+                className="bg-white text-black hover:bg-zinc-200 px-4 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
+              >
+                👤 {user.name}
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-gray-200 hover:text-white bg-gray-800/80 hover:bg-gray-700/80 border border-gray-750 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition"
+                >
+                  {t("login")}
+                </Link>
+                <Link
+                  href="/register"
+                  className="bg-white text-black hover:bg-zinc-200 px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
+                >
+                  {t("register")}
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>
@@ -52,20 +81,20 @@ export default function Home() {
         <div className="inline-flex items-center gap-2 bg-zinc-900/80 border border-zinc-750 px-4 py-1.5 rounded-full mb-8 shadow-sm">
           <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span className="text-xs text-zinc-300 font-medium">
-            🇮🇳 25,571 Daily Trains Across India • Verified Mobile & Email Dual-OTP
+            {t("heroPill")}
           </span>
         </div>
 
         {/* Hero Title */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6 max-w-4xl leading-tight">
-          Pan-India Railway Travel <br />
+          {t("heroTitle1")} <br />
           <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent dark:from-white dark:via-zinc-200 dark:to-zinc-400 light:from-black light:via-zinc-800 light:to-zinc-600">
-            Fast, Authentic & Verified.
+            {t("heroTitle2")}
           </span>
         </h1>
 
         <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mb-10 leading-relaxed">
-          Access the complete master schedule of 25,571 daily trains across all railway zones. Secure passenger accounts with mobile and email OTP, instant 10-digit PNR generation, and multi-tier coach berth selection.
+          {t("heroSubtitle")}
         </p>
 
         {/* CTA Buttons */}
@@ -74,19 +103,25 @@ export default function Home() {
             href="/search"
             className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 rounded-2xl font-bold text-lg transition shadow-xl shadow-white/10 flex items-center gap-2 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
           >
-            <span>🔍 Search 25,500+ Trains</span>
+            <span>{t("searchBtn")}</span>
+          </Link>
+          <Link
+            href="/wallet"
+            className="bg-amber-950/60 hover:bg-amber-900/60 text-amber-200 border border-amber-700/60 px-7 py-3.5 rounded-2xl font-semibold text-lg transition flex items-center gap-2"
+          >
+            <span>💳 {t("wallet")}</span>
           </Link>
           <Link
             href="/register"
             className="bg-gray-850 hover:bg-gray-800 text-gray-200 border border-gray-750 px-8 py-3.5 rounded-2xl font-semibold text-lg transition flex items-center gap-2"
           >
-            <span>🔐 Create Verified Account</span>
+            <span>{t("createAccountBtn")}</span>
           </Link>
           <Link
             href="/pnr"
             className="bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-800 px-6 py-3.5 rounded-2xl font-semibold text-lg transition flex items-center gap-2"
           >
-            <span>🎫 PNR Status</span>
+            <span>{t("pnrBtn")}</span>
           </Link>
         </div>
 
@@ -104,15 +139,15 @@ export default function Home() {
             <div className="text-3xl mb-3">📱</div>
             <h3 className="text-lg font-bold text-white mb-2">Dual-Factor OTP Auth</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Verify both your 10-digit mobile number and email ID with real 6-digit OTPs. Login instantly with one-time passcodes or secure password.
+              Verify both your 10-digit Indian mobile number and Gmail/Outlook/iCloud/Yahoo ID with real 6-digit OTPs.
             </p>
           </div>
 
           <div className="bg-gray-900/60 border border-gray-800 p-6 rounded-2xl hover:border-gray-700 transition">
-            <div className="text-3xl mb-3">🎫</div>
-            <h3 className="text-lg font-bold text-white mb-2">Instant PNR & Coach Berth</h3>
+            <div className="text-3xl mb-3">💳</div>
+            <h3 className="text-lg font-bold text-white mb-2">GADDVYA Rail Wallet</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Interactive berth seat picker across 1A, 2A, 3A, CC, and Sleeper classes with authentic 10-digit Indian Railways PNR generation.
+              1-Click Tatkal checkout, zero gateway convenience fees, and 100% instant refunds within seconds on ticket cancellations.
             </p>
           </div>
         </div>
@@ -184,7 +219,7 @@ export default function Home() {
         {/* Popular Route Highlights */}
         <div className="w-full mt-16 pt-12 border-t border-gray-850">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-6">
-            Popular High-Speed Rail Corridors
+            {t("popularRoutes")}
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
@@ -213,10 +248,11 @@ export default function Home() {
       <footer className="border-t border-gray-900 py-8 bg-gray-950">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
           <p>© {new Date().getFullYear()} GADDVYA Indian Railways Reservation. Built by Himanshu Goyal.</p>
-          <div className="flex gap-6">
-            <Link href="/search" className="hover:text-gray-300 transition">Search</Link>
-            <Link href="/bookings" className="hover:text-gray-300 transition">Bookings</Link>
-            <Link href="/admin" className="hover:text-gray-300 transition">Admin Portal</Link>
+          <div className="flex gap-6 items-center">
+            <Link href="/search" className="hover:text-gray-300 transition">{t("searchTrains")}</Link>
+            <Link href="/wallet" className="hover:text-gray-300 transition">{t("wallet")}</Link>
+            <Link href="/bookings" className="hover:text-gray-300 transition">{t("myBookings")}</Link>
+            <Link href="/admin" className="hover:text-gray-300 transition">{t("admin")}</Link>
             <a
               href="https://github.com/thehimanshugoyl/train-booking-24bda70369"
               target="_blank"

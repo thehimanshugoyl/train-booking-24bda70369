@@ -2,17 +2,22 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useLanguageStore } from "@/store/useLanguageStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import AnimatedTrainBackground from "@/components/AnimatedTrainBackground";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSelector from "@/components/LanguageSelector";
+import { isAllowedEmail, isValidIndianPhone, cleanIndianPhone } from "@/lib/validation";
 
 export default function Register() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
+
+  const { t } = useLanguageStore();
 
   // Personal details
   const [form, setForm] = useState({
@@ -65,15 +70,23 @@ export default function Register() {
 
   // Send Email OTP
   const handleSendEmailOtp = async () => {
-    if (!form.email || !form.email.includes("@")) {
-      setError("Please enter a valid email address first.");
+    const cleanMail = form.email.trim().toLowerCase();
+    if (!cleanMail) {
+      setError("Please enter your email address.");
       return;
     }
+    if (!isAllowedEmail(cleanMail)) {
+      setError(
+        "Only Gmail, Outlook, iCloud, and Yahoo email addresses are allowed (@gmail.com, @outlook.com, @hotmail.com, @icloud.com, @yahoo.com, etc.)."
+      );
+      return;
+    }
+
     setError("");
     setLoading(true);
     try {
       const res = await axios.post("/api/auth/send-otp", {
-        identifier: form.email,
+        identifier: cleanMail,
         type: "email",
         purpose: "register",
         name: form.name,
@@ -101,7 +114,7 @@ export default function Register() {
     setLoading(true);
     try {
       await axios.post("/api/auth/verify-otp", {
-        identifier: form.email,
+        identifier: form.email.trim().toLowerCase(),
         otp: emailOtp,
         purpose: "register",
       });
@@ -116,9 +129,9 @@ export default function Register() {
 
   // Send Phone OTP
   const handleSendPhoneOtp = async () => {
-    const cleanPhone = form.phone.replace(/\D/g, "").slice(-10);
-    if (cleanPhone.length !== 10) {
-      setError("Please enter a valid 10-digit mobile number.");
+    const cleanPhone = cleanIndianPhone(form.phone);
+    if (!isValidIndianPhone(cleanPhone)) {
+      setError("Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.");
       return;
     }
     setError("");
@@ -148,16 +161,17 @@ export default function Register() {
       setError("Please enter the 6-digit phone OTP.");
       return;
     }
+    const cleanPhone = cleanIndianPhone(form.phone);
     setError("");
     setLoading(true);
     try {
       await axios.post("/api/auth/verify-otp", {
-        identifier: form.phone,
+        identifier: cleanPhone,
         otp: phoneOtp,
         purpose: "register",
       });
       setIsPhoneVerified(true);
-      setInfoMessage("✅ Mobile number successfully verified!");
+      setInfoMessage("✅ Indian mobile number successfully verified!");
     } catch (err: any) {
       setError(err.response?.data?.error || "Invalid or expired Mobile OTP.");
     } finally {
@@ -186,6 +200,8 @@ export default function Register() {
     try {
       const res = await axios.post("/api/auth/register", {
         ...form,
+        email: form.email.trim().toLowerCase(),
+        phone: cleanIndianPhone(form.phone),
         emailOtp,
         phoneOtp,
       });
@@ -198,13 +214,19 @@ export default function Register() {
     }
   };
 
+  const isEmailValidFormat = isAllowedEmail(form.email);
+  const isPhoneValidFormat = isValidIndianPhone(form.phone);
+
   return (
     <AnimatedTrainBackground>
       <div className="flex items-center justify-between w-full max-w-xl mb-6">
         <Link href="/" className="transition-transform hover:scale-105">
           <Logo size="md" />
         </Link>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <LanguageSelector />
+          <ThemeToggle />
+        </div>
       </div>
 
       <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 w-full max-w-xl shadow-2xl shadow-black/80 ring-1 ring-white/5">
@@ -261,20 +283,20 @@ export default function Register() {
             </p>
 
             <div>
-              <label className="text-xs text-gray-300 block mb-1 font-medium">Full Legal Name</label>
+              <label className="text-xs text-gray-300 block mb-1 font-medium">{t("fullName")}</label>
               <input
                 type="text"
                 placeholder="e.g. Himanshu Goyal"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-blue-500 focus:outline-none"
+                className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm focus:border-zinc-400 focus:outline-none"
                 required
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-gray-300 block mb-1 font-medium">Gender</label>
+                <label className="text-xs text-gray-300 block mb-1 font-medium">{t("gender")}</label>
                 <select
                   value={form.gender}
                   onChange={(e) => setForm({ ...form, gender: e.target.value })}
@@ -287,7 +309,7 @@ export default function Register() {
               </div>
 
               <div>
-                <label className="text-xs text-gray-300 block mb-1 font-medium">Date of Birth</label>
+                <label className="text-xs text-gray-300 block mb-1 font-medium">{t("dob")}</label>
                 <input
                   type="date"
                   value={form.dob}
@@ -303,7 +325,7 @@ export default function Register() {
                 <label className="text-xs text-gray-300 block mb-1 font-medium">State / UT</label>
                 <input
                   type="text"
-                  placeholder="e.g. Delhi, Maharashtra"
+                  placeholder="e.g. Delhi, Punjab"
                   value={form.state}
                   onChange={(e) => setForm({ ...form, state: e.target.value })}
                   className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm"
@@ -314,7 +336,7 @@ export default function Register() {
                 <label className="text-xs text-gray-300 block mb-1 font-medium">City</label>
                 <input
                   type="text"
-                  placeholder="e.g. New Delhi, Mumbai"
+                  placeholder="e.g. New Delhi, Amritsar"
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
                   className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm"
@@ -324,7 +346,7 @@ export default function Register() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div>
-                <label className="text-xs text-gray-300 block mb-1 font-medium">ID Proof Type</label>
+                <label className="text-xs text-gray-300 block mb-1 font-medium">{t("idProof")}</label>
                 <select
                   value={form.idProofType}
                   onChange={(e) => setForm({ ...form, idProofType: e.target.value })}
@@ -379,7 +401,7 @@ export default function Register() {
 
             {/* Email OTP Card */}
             <div className="bg-gray-900 border border-gray-800 p-4 rounded-2xl">
-              <div className="flex justify-between items-center mb-2">
+              <div className="flex justify-between items-center mb-1.5">
                 <label className="text-xs text-gray-300 font-semibold flex items-center gap-1.5">
                   <span>✉️ Registered Email Address</span>
                   {isEmailVerified && (
@@ -390,26 +412,44 @@ export default function Register() {
                 </label>
               </div>
 
-              <div className="flex gap-2 mb-3">
+              {/* Email allowed hint banner */}
+              <div className="mb-2 text-[11px] text-amber-300/90 bg-amber-950/30 border border-amber-800/40 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                <span>🔒</span>
+                <span>{t("allowedEmailsNote")}</span>
+              </div>
+
+              <div className="flex gap-2 mb-2">
                 <input
                   type="email"
                   disabled={isEmailVerified}
-                  placeholder="your.email@gmail.com"
+                  placeholder="yourname@gmail.com"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="flex-1 bg-gray-950 border border-gray-700 rounded-xl p-2.5 text-white text-xs disabled:opacity-60"
+                  className={`flex-1 bg-gray-950 border rounded-xl p-2.5 text-white text-xs disabled:opacity-60 focus:outline-none ${
+                    form.email && !isEmailValidFormat
+                      ? "border-red-500/80"
+                      : form.email && isEmailValidFormat
+                      ? "border-emerald-500"
+                      : "border-gray-700"
+                  }`}
                 />
                 {!isEmailVerified && (
                   <button
                     type="button"
                     onClick={handleSendEmailOtp}
-                    disabled={loading || emailTimer > 0}
-                    className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 text-xs px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap dark:bg-white dark:text-black light:bg-black light:text-white"
+                    disabled={loading || emailTimer > 0 || !isEmailValidFormat}
+                    className="bg-white text-black hover:bg-zinc-200 disabled:opacity-40 text-xs px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap dark:bg-white dark:text-black light:bg-black light:text-white"
                   >
                     {emailTimer > 0 ? `Resend (${emailTimer}s)` : emailOtpSent ? "Resend OTP" : "Send OTP"}
                   </button>
                 )}
               </div>
+
+              {form.email && !isEmailValidFormat && (
+                <p className="text-[11px] text-red-400 mb-2">
+                  ⚠️ Invalid domain. Please use a valid @gmail.com, @outlook.com, @icloud.com, or @yahoo.com address.
+                </p>
+              )}
 
               {emailPreviewOtp && !isEmailVerified && (
                 <div className="bg-zinc-850 border border-zinc-700 p-2 rounded-lg mb-3 flex justify-between items-center text-xs">
@@ -426,7 +466,7 @@ export default function Register() {
               )}
 
               {emailOtpSent && !isEmailVerified && (
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-2">
                   <input
                     type="text"
                     maxLength={6}
@@ -449,7 +489,7 @@ export default function Register() {
 
             {/* Mobile Phone OTP Card */}
             <div className="bg-gray-900 border border-gray-800 p-4 rounded-2xl">
-              <div className="flex justify-between items-center mb-2">
+              <div className="flex justify-between items-center mb-1.5">
                 <label className="text-xs text-gray-300 font-semibold flex items-center gap-1.5">
                   <span>📱 Indian Mobile Number (+91)</span>
                   {isPhoneVerified && (
@@ -460,7 +500,13 @@ export default function Register() {
                 </label>
               </div>
 
-              <div className="flex gap-2 mb-3">
+              {/* Phone allowed hint banner */}
+              <div className="mb-2 text-[11px] text-blue-300/90 bg-blue-950/30 border border-blue-800/40 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                <span>🇮🇳</span>
+                <span>{t("indianPhoneOnly")}</span>
+              </div>
+
+              <div className="flex gap-2 mb-2">
                 <span className="bg-gray-950 border border-gray-700 rounded-xl px-3 py-2.5 text-gray-400 text-xs font-mono flex items-center">
                   +91
                 </span>
@@ -471,19 +517,31 @@ export default function Register() {
                   placeholder="98765 43210"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })}
-                  className="flex-1 bg-gray-950 border border-gray-700 rounded-xl p-2.5 text-white text-xs font-mono disabled:opacity-60"
+                  className={`flex-1 bg-gray-950 border rounded-xl p-2.5 text-white text-xs font-mono disabled:opacity-60 focus:outline-none ${
+                    form.phone && !isPhoneValidFormat
+                      ? "border-red-500/80"
+                      : form.phone && isPhoneValidFormat
+                      ? "border-emerald-500"
+                      : "border-gray-700"
+                  }`}
                 />
                 {!isPhoneVerified && (
                   <button
                     type="button"
                     onClick={handleSendPhoneOtp}
-                    disabled={loading || phoneTimer > 0}
-                    className="bg-white text-black hover:bg-zinc-200 disabled:opacity-50 text-xs px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap dark:bg-white dark:text-black light:bg-black light:text-white"
+                    disabled={loading || phoneTimer > 0 || !isPhoneValidFormat}
+                    className="bg-white text-black hover:bg-zinc-200 disabled:opacity-40 text-xs px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap dark:bg-white dark:text-black light:bg-black light:text-white"
                   >
                     {phoneTimer > 0 ? `Resend (${phoneTimer}s)` : phoneOtpSent ? "Resend OTP" : "Send SMS"}
                   </button>
                 )}
               </div>
+
+              {form.phone && !isPhoneValidFormat && (
+                <p className="text-[11px] text-red-400 mb-2">
+                  ⚠️ Must be a 10-digit Indian mobile number starting with 6, 7, 8, or 9.
+                </p>
+              )}
 
               {phonePreviewOtp && !isPhoneVerified && (
                 <div className="bg-zinc-850 border border-zinc-700 p-2 rounded-lg mb-3 flex justify-between items-center text-xs">
@@ -500,7 +558,7 @@ export default function Register() {
               )}
 
               {phoneOtpSent && !isPhoneVerified && (
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-2">
                   <input
                     type="text"
                     maxLength={6}
@@ -617,9 +675,9 @@ export default function Register() {
         )}
 
         <p className="text-gray-400 text-xs text-center mt-6 border-t border-gray-800 pt-4">
-          Already have an account?{" "}
+          {t("alreadyHaveAccount")}{" "}
           <Link href="/login" className="text-zinc-200 dark:text-zinc-200 light:text-zinc-900 font-bold hover:underline">
-            Sign In Here
+            {t("login")}
           </Link>
         </p>
       </div>

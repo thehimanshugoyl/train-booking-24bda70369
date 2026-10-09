@@ -2,16 +2,20 @@
 import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useWalletStore } from "@/store/useWalletStore";
+import { useLanguageStore } from "@/store/useLanguageStore";
 import axios from "axios";
 import { Suspense } from "react";
 import Link from "next/link";
 import { generateTicketPdf } from "@/lib/ticketPdf";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSelector from "@/components/LanguageSelector";
 
 function PaymentContent() {
   const [step, setStep] = useState(1);
   const [processing, setProcessing] = useState(false);
+  const [paymentMethodTab, setPaymentMethodTab] = useState<"wallet" | "card" | "upi" | "netbanking">("wallet");
   const [card, setCard] = useState({
     number: "",
     name: "",
@@ -22,6 +26,8 @@ function PaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { token } = useAuthStore();
+  const { balance, deductFunds, addFunds } = useWalletStore();
+  const { t } = useLanguageStore();
 
   const trainId = searchParams.get("trainId");
   const seats = searchParams.get("seats") || "1";
@@ -34,6 +40,8 @@ function PaymentContent() {
   const to = searchParams.get("to") || "";
   const date = searchParams.get("date") || "";
 
+  const numericPrice = parseFloat(price) || 0;
+
   // Parse multi-passengers list if provided
   const parsedPassengers = useMemo(() => {
     const raw = searchParams.get("passengers");
@@ -45,11 +53,15 @@ function PaymentContent() {
     }
   }, [searchParams]);
 
-  const handlePayment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Payment via Wallet (1-Click)
+  const handleWalletPayment = async () => {
+    if (balance < numericPrice) {
+      alert("Insufficient wallet balance. Please add funds to your wallet.");
+      return;
+    }
+
     setProcessing(true);
-    // Simulated bank authorization
-    await new Promise((resolve) => setTimeout(resolve, 1800));
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
     try {
       const res = await axios.post(
@@ -61,7 +73,40 @@ function PaymentContent() {
           passengerName: parsedPassengers[0]?.name || passengerName,
           passengerAge: Number(parsedPassengers[0]?.age || passengerAge) || 25,
           passengers: parsedPassengers.length > 0 ? parsedPassengers : undefined,
-          paymentMethod: "card",
+          paymentMethod: "GADDVYA Rail Wallet",
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Deduct from wallet store
+      deductFunds(numericPrice, `Train Ticket: ${trainName}`, res.data.booking?.pnr);
+      setBooking(res.data.booking);
+      setStep(3);
+    } catch (err: any) {
+      alert("Booking failed: " + (err.response?.data?.error || "Transaction declined."));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Payment via Card/External
+  const handleCardPayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProcessing(true);
+    // Simulated bank authorization
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    try {
+      const res = await axios.post(
+        "/api/bookings",
+        {
+          trainId,
+          seats: Number(seats),
+          classType,
+          passengerName: parsedPassengers[0]?.name || passengerName,
+          passengerAge: Number(parsedPassengers[0]?.age || passengerAge) || 25,
+          passengers: parsedPassengers.length > 0 ? parsedPassengers : undefined,
+          paymentMethod: paymentMethodTab,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -77,7 +122,7 @@ function PaymentContent() {
   const downloadTextTicket = () => {
     const content = `
 =========================================
-          RAILX E-RESERVATION SLIP
+          GADDVYA E-RESERVATION SLIP
 =========================================
 PNR NUMBER : ${booking?.pnr || "N/A"}
 Booking ID : ${booking?._id}
@@ -87,6 +132,7 @@ Date       : ${date || new Date().toLocaleDateString("en-IN")}
 Class      : ${classType}
 Seats      : ${seats}
 Total Fare : ₹${price}
+Payment    : ${booking?.paymentMethod || "Verified Transaction"}
 Status     : CONFIRMED
 
 PASSENGERS:
@@ -100,26 +146,27 @@ ${
         .join("\n")
     : `1. ${passengerName} (${passengerAge}y)`
 }
-
 =========================================
-Thank you for traveling with RailX!
-=========================================
-    `;
+Thank you for traveling with Indian Railways!
+`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `ticket-${booking?.pnr || booking?._id}.txt`;
+    a.download = `Ticket_${booking?.pnr || "GADDVYA"}.txt`;
     a.click();
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-6 flex flex-col items-center justify-center">
-      <div className="w-full max-w-lg mb-4 flex justify-between items-center">
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-center items-center p-4">
+      <div className="flex items-center justify-between w-full max-w-lg mb-6">
         <Link href="/">
           <Logo size="sm" />
         </Link>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <LanguageSelector />
+          <ThemeToggle />
+        </div>
       </div>
 
       <div className="bg-gray-850 border border-gray-800 rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl">
@@ -222,190 +269,271 @@ Thank you for traveling with RailX!
         {/* Step 2 - Payment Form */}
         {step === 2 && (
           <div>
-            <h2 className="text-xl font-bold text-white mb-1">💳 Payment Gateway</h2>
+            <h2 className="text-xl font-bold text-white mb-1">💳 Choose Payment Mode</h2>
             <p className="text-xs text-gray-400 mb-5">
-              Encrypted mock checkout simulation (test credentials accepted)
+              Instant 1-click checkout with GADDVYA Rail Wallet or bank card
             </p>
 
+            {/* Payment Method Switcher */}
             <div className="flex gap-2 mb-5">
-              {["💳 Credit / Debit Card", "📱 UPI", "🏦 NetBanking"].map((method, i) => (
+              {[
+                { id: "wallet", label: "⚡ Rail Wallet" },
+                { id: "card", label: "💳 Card" },
+                { id: "upi", label: "📱 UPI" },
+                { id: "netbanking", label: "🏦 NetBanking" },
+              ].map((m) => (
                 <button
-                  key={i}
+                  key={m.id}
                   type="button"
-                  className={`flex-1 py-2 rounded-xl text-xs font-semibold transition ${
-                    i === 0
-                      ? "bg-white text-black shadow-sm dark:bg-white dark:text-black light:bg-black light:text-white"
-                      : "bg-gray-800 text-gray-400"
+                  onClick={() => setPaymentMethodTab(m.id as any)}
+                  className={`flex-1 py-2 px-1 text-center rounded-xl text-xs font-semibold transition cursor-pointer ${
+                    paymentMethodTab === m.id
+                      ? "bg-white text-black shadow-md dark:bg-white dark:text-black light:bg-black light:text-white font-bold"
+                      : "bg-gray-800/80 text-gray-400 hover:text-white"
                   }`}
                 >
-                  {method}
+                  {m.label}
                 </button>
               ))}
             </div>
 
-            <form onSubmit={handlePayment} className="space-y-4">
-              <div>
-                <label className="text-gray-400 text-xs mb-1 block">Card Number</label>
-                <input
-                  type="text"
-                  maxLength={19}
-                  placeholder="4532 •••• •••• 8891"
-                  value={card.number}
-                  onChange={(e) => {
-                    const val = e.target.value
-                      .replace(/\D/g, "")
-                      .replace(/(.{4})/g, "$1 ")
-                      .trim();
-                    setCard({ ...card, number: val });
-                  }}
-                  className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white font-mono text-sm"
-                  required
-                />
-              </div>
+            {/* OPTION 1: GADDVYA Rail Wallet */}
+            {paymentMethodTab === "wallet" && (
+              <div className="space-y-4 bg-zinc-900 border border-zinc-750 p-5 rounded-2xl">
+                <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                  <div>
+                    <span className="text-xs text-zinc-400 block font-medium">GADDVYA Rail Wallet Balance</span>
+                    <span className="text-2xl font-extrabold text-white flex items-baseline gap-1 mt-0.5">
+                      <span className="text-amber-400">₹</span>
+                      <span>{balance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                    </span>
+                  </div>
+                  <span className="bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] px-2.5 py-1 rounded-full font-bold">
+                    ✓ 0% Surcharge
+                  </span>
+                </div>
 
-              <div>
-                <label className="text-gray-400 text-xs mb-1 block">Cardholder Name</label>
-                <input
-                  type="text"
-                  placeholder="HIMANSHU GOYAL"
-                  value={card.name}
-                  onChange={(e) => setCard({ ...card, name: e.target.value.toUpperCase() })}
-                  className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm"
-                  required
-                />
-              </div>
+                <div className="text-xs text-zinc-300 space-y-1">
+                  <p className="flex items-center gap-1.5 text-emerald-300">
+                    <span>⚡</span> 1-Click Instant Ticket Confirmation
+                  </p>
+                  <p className="flex items-center gap-1.5 text-zinc-400">
+                    <span>🔄</span> 100% Instant Refund if cancelled
+                  </p>
+                </div>
 
-              <div className="grid grid-cols-2 gap-3">
+                {balance >= numericPrice ? (
+                  <button
+                    type="button"
+                    disabled={processing}
+                    onClick={handleWalletPayment}
+                    className="w-full bg-white text-black hover:bg-zinc-200 disabled:opacity-50 py-3.5 rounded-xl font-bold text-sm transition shadow-xl shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
+                  >
+                    {processing ? "Authorizing Payment..." : `⚡ Pay ₹${price} with Rail Wallet (1-Click)`}
+                  </button>
+                ) : (
+                  <div className="space-y-3 pt-2">
+                    <p className="text-xs text-red-400">
+                      ⚠️ Insufficient balance (Fare is ₹{price}, you have ₹{balance.toFixed(2)}).
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addFunds(1000, "Instant Quick-Topup");
+                        alert("₹1,000 added to your Rail Wallet!");
+                      }}
+                      className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-2.5 rounded-xl text-xs transition"
+                    >
+                      + Quick Add ₹1,000 to Wallet
+                    </button>
+                    <Link
+                      href="/wallet"
+                      className="block text-center text-xs text-zinc-400 underline hover:text-white"
+                    >
+                      Go to Full Wallet Manager →
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* OPTION 2: Card Payment */}
+            {paymentMethodTab === "card" && (
+              <form onSubmit={handleCardPayment} className="space-y-4">
                 <div>
-                  <label className="text-gray-400 text-xs mb-1 block">Expiry</label>
+                  <label className="text-gray-400 text-xs mb-1 block">Card Number</label>
                   <input
                     type="text"
-                    placeholder="MM/YY"
-                    maxLength={5}
-                    value={card.expiry}
+                    maxLength={19}
+                    placeholder="4532 •••• •••• 8891"
+                    value={card.number}
                     onChange={(e) => {
                       const val = e.target.value
                         .replace(/\D/g, "")
-                        .replace(/^(\d{2})/, "$1/");
-                      setCard({ ...card, expiry: val });
+                        .replace(/(.{4})/g, "$1 ")
+                        .trim();
+                      setCard({ ...card, number: val });
                     }}
                     className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white font-mono text-sm"
                     required
                   />
                 </div>
+
                 <div>
-                  <label className="text-gray-400 text-xs mb-1 block">CVV</label>
+                  <label className="text-gray-400 text-xs mb-1 block">Cardholder Name</label>
                   <input
-                    type="password"
-                    placeholder="•••"
-                    maxLength={3}
-                    value={card.cvv}
-                    onChange={(e) => setCard({ ...card, cvv: e.target.value })}
-                    className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white font-mono text-sm"
+                    type="text"
+                    placeholder="HIMANSHU GOYAL"
+                    value={card.name}
+                    onChange={(e) => setCard({ ...card, name: e.target.value.toUpperCase() })}
+                    className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm"
                     required
                   />
                 </div>
-              </div>
 
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-3.5 flex justify-between items-center">
-                <span className="text-gray-400 text-sm">Amount to Debit</span>
-                <span className="text-yellow-400 font-extrabold text-xl">₹{price}</span>
-              </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-gray-400 text-xs mb-1 block">Expiry</label>
+                    <input
+                      type="text"
+                      placeholder="MM/YY"
+                      maxLength={5}
+                      value={card.expiry}
+                      onChange={(e) => {
+                        const val = e.target.value
+                          .replace(/\D/g, "")
+                          .replace(/^(\d{2})/, "$1/");
+                        setCard({ ...card, expiry: val });
+                      }}
+                      className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white font-mono text-sm"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 text-xs mb-1 block">CVV</label>
+                    <input
+                      type="password"
+                      placeholder="•••"
+                      maxLength={4}
+                      value={card.cvv}
+                      onChange={(e) => setCard({ ...card, cvv: e.target.value.replace(/\D/g, "") })}
+                      className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white font-mono text-sm"
+                      required
+                    />
+                  </div>
+                </div>
 
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="bg-gray-800 hover:bg-gray-750 px-4 py-3 rounded-xl text-sm text-gray-300 font-semibold"
-                >
-                  Back
-                </button>
                 <button
                   type="submit"
                   disabled={processing}
-                  className="flex-1 bg-white text-black hover:bg-zinc-200 disabled:opacity-50 py-3.5 rounded-xl font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
+                  className="w-full bg-white text-black hover:bg-zinc-200 disabled:opacity-50 py-3.5 rounded-xl font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
                 >
-                  {processing ? "⏳ Processing Transaction..." : `Pay ₹${price}`}
+                  {processing ? "Connecting Bank Gateway..." : `Pay ₹${price} with Card`}
                 </button>
-              </div>
-            </form>
+              </form>
+            )}
+
+            {/* OPTION 3: UPI / Netbanking Form */}
+            {(paymentMethodTab === "upi" || paymentMethodTab === "netbanking") && (
+              <form onSubmit={handleCardPayment} className="space-y-4">
+                <div>
+                  <label className="text-gray-400 text-xs mb-1 block">
+                    {paymentMethodTab === "upi" ? "UPI ID / VPA" : "Select Bank"}
+                  </label>
+                  {paymentMethodTab === "upi" ? (
+                    <input
+                      type="text"
+                      placeholder="user@oksbi or 9876543210@paytm"
+                      className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm"
+                      required
+                    />
+                  ) : (
+                    <select className="w-full bg-gray-950 border border-gray-700 rounded-xl p-3 text-white text-sm">
+                      <option>State Bank of India (SBI)</option>
+                      <option>HDFC Bank</option>
+                      <option>ICICI Bank</option>
+                      <option>Punjab National Bank (PNB)</option>
+                    </select>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={processing}
+                  className="w-full bg-white text-black hover:bg-zinc-200 disabled:opacity-50 py-3.5 rounded-xl font-bold transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
+                >
+                  {processing ? "Authorizing..." : `Pay ₹${price}`}
+                </button>
+              </form>
+            )}
           </div>
         )}
 
         {/* Step 3 - Ticket Confirmation */}
         {step === 3 && booking && (
           <div className="text-center">
-            <div className="text-5xl mb-2">🎉</div>
-            <h2 className="text-2xl font-black text-white mb-1">Payment Successful!</h2>
+            <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+              ✓
+            </div>
+            <h2 className="text-2xl font-extrabold text-white mb-1">Booking Confirmed!</h2>
             <p className="text-xs text-gray-400 mb-6">
-              Your railway reservation has been confirmed with GADDVYA
+              Your railway reservation has been authorized and issued by GADDVYA Portal.
             </p>
 
-            {/* Ticket Card Preview */}
-            <div className="bg-gray-900 rounded-2xl p-5 border border-zinc-700 mb-6 text-left relative overflow-hidden">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-white font-bold text-base">🚂 GADDVYA BOARDING PASS</span>
-                <span className="bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">
-                  CONFIRMED
-                </span>
-              </div>
-
-              {/* PNR Banner */}
-              <div className="bg-zinc-950 border border-zinc-800 p-2.5 rounded-xl mb-3 flex justify-between items-center">
-                <span className="text-xs text-zinc-400 font-semibold">PNR NUMBER</span>
-                <span className="text-white font-mono font-black text-base tracking-wider">
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 text-left space-y-2 mb-6">
+              <div className="flex justify-between items-center pb-2 border-b border-gray-800">
+                <span className="text-xs text-gray-400">PNR Number:</span>
+                <span className="font-mono text-yellow-400 font-bold text-base bg-yellow-950/60 px-2 py-0.5 rounded border border-yellow-700/50">
                   {booking.pnr}
                 </span>
               </div>
-
-              <div className="space-y-1.5 text-xs text-gray-300">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Train:</span>
-                  <span className="text-white font-medium">{trainName}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Class:</span>
-                  <span className="text-zinc-200 font-bold">{classType}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Seats:</span>
-                  <span className="text-white font-medium">{seats}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Amount Paid:</span>
-                  <span className="text-white font-bold">₹{price}</span>
-                </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-400">Train:</span>
+                <span className="text-white font-medium">{trainName}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-400">Route:</span>
+                <span className="text-white">
+                  {from} → {to}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-400">Total Paid:</span>
+                <span className="text-emerald-400 font-bold">₹{price}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-400">Payment Channel:</span>
+                <span className="text-zinc-300 font-medium">{booking.paymentMethod || "Rail Wallet"}</span>
               </div>
             </div>
 
-            {/* Action buttons */}
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               <button
                 onClick={() => generateTicketPdf(booking)}
-                className="w-full bg-white text-black hover:bg-zinc-200 py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white cursor-pointer"
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2"
               >
-                <span>📥 Download PDF Boarding Pass</span>
+                <span>📥 Download IRCTC PDF Slip</span>
               </button>
 
               <button
                 onClick={downloadTextTicket}
-                className="w-full bg-gray-800 hover:bg-gray-750 border border-gray-750 py-2.5 rounded-xl text-xs text-gray-300 transition"
+                className="w-full bg-gray-800 hover:bg-gray-750 text-gray-200 border border-gray-700 py-2.5 rounded-xl text-xs font-semibold transition"
               >
-                Download Plain Text Slip
+                Save Plain Text Slip (.txt)
               </button>
 
-              <div className="grid grid-cols-2 gap-2 pt-2">
+              <div className="flex gap-2 pt-2">
                 <Link
-                  href="/pnr"
-                  className="bg-gray-800 hover:bg-gray-750 text-gray-200 py-2.5 rounded-xl text-xs font-semibold text-center block transition border border-gray-700"
+                  href="/wallet"
+                  className="flex-1 bg-zinc-900 hover:bg-zinc-800 text-amber-300 border border-zinc-700 py-2.5 rounded-xl text-xs font-semibold text-center transition"
                 >
-                  Track PNR
+                  💳 View Wallet
                 </Link>
                 <Link
                   href="/bookings"
-                  className="bg-gray-800 hover:bg-gray-750 text-gray-200 py-2.5 rounded-xl text-xs font-semibold text-center block transition border border-gray-700"
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-2.5 rounded-xl text-xs font-semibold text-center transition"
                 >
-                  My Bookings
+                  My Bookings →
                 </Link>
               </div>
             </div>
@@ -421,7 +549,7 @@ export default function Payment() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-          Loading checkout...
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
         </div>
       }
     >

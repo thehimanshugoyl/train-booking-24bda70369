@@ -2,16 +2,21 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useLanguageStore } from "@/store/useLanguageStore";
+import { useWalletStore } from "@/store/useWalletStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { generateTicketPdf } from "@/lib/ticketPdf";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSelector from "@/components/LanguageSelector";
 
 export default function Bookings() {
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, token, logout } = useAuthStore();
+  const { t } = useLanguageStore();
+  const { refundFunds } = useWalletStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -35,8 +40,8 @@ export default function Bookings() {
     }
   };
 
-  const cancelBooking = async (id: string, pnr?: string) => {
-    if (!confirm(`Are you sure you want to cancel booking ${pnr ? `(PNR: ${pnr})` : ""}?`)) return;
+  const cancelBooking = async (id: string, pnr?: string, amount?: number) => {
+    if (!confirm(`Are you sure you want to cancel booking ${pnr ? `(PNR: ${pnr})` : ""}? 100% of your fare (₹${amount || 0}) will be refunded instantly to your GADDVYA Rail Wallet.`)) return;
     try {
       await axios.put(
         `/api/bookings/${id}`,
@@ -45,6 +50,10 @@ export default function Bookings() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      if (amount && amount > 0) {
+        refundFunds(amount, `Cancelled Ticket PNR: ${pnr || id}`, pnr);
+      }
+      alert(`Booking cancelled successfully. ₹${amount || 0} has been refunded immediately to your GADDVYA Rail Wallet!`);
       fetchBookings();
     } catch (err: any) {
       alert("Cancellation failed: " + (err.response?.data?.error || err.message));
@@ -54,72 +63,81 @@ export default function Bookings() {
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
       {/* Navbar */}
-      <nav className="flex flex-wrap justify-between items-center mb-8 bg-gray-800 rounded-xl p-4 gap-3">
+      <nav className="flex flex-wrap justify-between items-center mb-8 bg-gray-800 rounded-2xl p-4 gap-3 border border-gray-700/60 shadow-lg">
         <Link href="/">
           <Logo size="sm" />
         </Link>
-        <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
           <span className="text-gray-300 text-sm hidden sm:inline">Hello, {user?.name}</span>
           
+          <LanguageSelector />
           <ThemeToggle />
 
           <Link
-            href="/pnr"
-            className="bg-gray-750 hover:bg-gray-700 text-zinc-200 border border-zinc-700 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition"
+            href="/wallet"
+            className="text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs font-bold transition flex items-center gap-1.5"
           >
-            Track PNR
+            <span>💳</span> {t("wallet")}
+          </Link>
+          <Link
+            href="/pnr"
+            className="bg-gray-750 hover:bg-gray-750 text-zinc-200 border border-zinc-700 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition"
+          >
+            {t("pnrStatus")}
           </Link>
           <Link
             href="/profile"
             className="bg-gray-700 hover:bg-gray-650 px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5"
           >
-            <span>👤</span> Profile
+            <span>👤</span> {t("profile")}
           </Link>
           <Link
             href="/search"
             className="bg-white text-black hover:bg-zinc-200 px-3.5 py-1.5 rounded-lg text-sm font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
           >
-            🔍 Search Trains
+            🔍 {t("searchTrains")}
           </Link>
           <button
             onClick={() => {
               logout();
               router.push("/login");
             }}
-            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-4 py-2 rounded-lg text-sm transition"
+            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3.5 py-1.5 rounded-lg text-sm transition cursor-pointer"
           >
-            Logout
+            {t("logout")}
           </button>
         </div>
       </nav>
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-yellow-400">🎫 My Bookings & Tickets</h2>
-          <p className="text-gray-400 text-sm">View confirmed trips, PNR numbers, and itineraries</p>
+          <h1 className="text-2xl font-bold">{t("myBookings")}</h1>
+          <p className="text-xs text-gray-400 mt-0.5">Active and past train reservation slips</p>
         </div>
         <Link
-          href="/search"
-          className="text-sm bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg border border-gray-700"
+          href="/wallet"
+          className="bg-zinc-900 border border-zinc-750 hover:border-zinc-600 px-4 py-2 rounded-xl text-xs font-medium text-amber-300 flex items-center gap-2"
         >
-          Book Another Ticket →
+          <span>⚡ Instant Auto-Refunds enabled with Rail Wallet</span>
         </Link>
       </div>
 
       {loading ? (
-        <div className="text-center py-16">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-400 mx-auto mb-3"></div>
-          <p className="text-gray-400">Fetching your bookings...</p>
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white mx-auto mb-3"></div>
+          <p className="text-gray-400 text-sm">Loading your bookings...</p>
         </div>
       ) : bookings.length === 0 ? (
-        <div className="text-center py-16 bg-gray-850 rounded-2xl border border-gray-800">
+        <div className="text-center py-20 bg-gray-900 rounded-2xl border border-gray-800">
           <p className="text-gray-400 text-lg mb-2">No bookings found</p>
-          <p className="text-gray-500 text-sm mb-6">You haven't reserved any train journeys yet.</p>
+          <p className="text-gray-500 text-sm mb-6">
+            You haven't reserved any train tickets yet.
+          </p>
           <Link
             href="/search"
-            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-semibold inline-block"
+            className="bg-white text-black hover:bg-zinc-200 font-bold px-6 py-2.5 rounded-xl text-sm transition shadow-lg shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
           >
-            Find Trains Now
+            Search Trains Now
           </Link>
         </div>
       ) : (
@@ -214,10 +232,10 @@ export default function Bookings() {
                         <span>📥 Download PDF</span>
                       </button>
                       <button
-                        onClick={() => cancelBooking(booking._id, booking.pnr)}
-                        className="bg-red-600/80 hover:bg-red-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition"
+                        onClick={() => cancelBooking(booking._id, booking.pnr, booking.totalPrice)}
+                        className="bg-red-600/80 hover:bg-red-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer"
                       >
-                        Cancel Booking
+                        Cancel & Instant Refund
                       </button>
                     </div>
                   )}

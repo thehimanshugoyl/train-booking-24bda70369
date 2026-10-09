@@ -5,6 +5,7 @@ import Link from "next/link";
 import { generateTicketPdf } from "@/lib/ticketPdf";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSelector from "@/components/LanguageSelector";
 
 export default function PnrPage() {
   const [pnr, setPnr] = useState("");
@@ -39,6 +40,7 @@ export default function PnrPage() {
           <Logo size="sm" />
         </Link>
         <div className="flex items-center gap-3">
+          <LanguageSelector />
           <ThemeToggle />
           <Link
             href="/search"

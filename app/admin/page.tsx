@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSelector from "@/components/LanguageSelector";
 
 export default function Admin() {
   const [trains, setTrains] = useState([]);
@@ -196,6 +197,7 @@ export default function Admin() {
           <Logo size="sm" />
         </Link>
         <div className="flex flex-wrap gap-2.5 items-center">
+          <LanguageSelector />
           <ThemeToggle />
           <button
             onClick={handleSeedAllIndiaTrains}

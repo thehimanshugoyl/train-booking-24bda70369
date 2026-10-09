@@ -6,9 +6,14 @@ import Link from "next/link";
 import axios from "axios";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSelector from "@/components/LanguageSelector";
+import { useLanguageStore } from "@/store/useLanguageStore";
+import { useWalletStore } from "@/store/useWalletStore";
 
 export default function ProfilePage() {
   const { user, token, logout } = useAuthStore();
+  const { t } = useLanguageStore();
+  const { balance } = useWalletStore();
   const router = useRouter();
   const [bookingsCount, setBookingsCount] = useState<number | null>(null);
 
@@ -42,27 +47,34 @@ export default function ProfilePage() {
           <Logo size="sm" />
         </Link>
         <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
+          <LanguageSelector />
           <ThemeToggle />
+          <Link
+            href="/wallet"
+            className="text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs font-bold transition flex items-center gap-1.5"
+          >
+            <span>💳</span> {t("wallet")}
+          </Link>
           <Link
             href="/search"
             className="bg-white text-black hover:bg-zinc-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-md shadow-white/10 dark:bg-white dark:text-black light:bg-black light:text-white"
           >
-            🔍 Search Trains
+            🔍 {t("searchTrains")}
           </Link>
           <Link
             href="/bookings"
             className="bg-gray-800 hover:bg-gray-750 text-gray-200 border border-gray-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition"
           >
-            🎫 My Bookings
+            🎫 {t("myBookings")}
           </Link>
           <button
             onClick={() => {
               logout();
               router.push("/login");
             }}
-            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition"
+            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer"
           >
-            Logout
+            {t("logout")}
           </button>
         </div>
       </nav>
@@ -100,17 +112,32 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 text-center min-w-[140px]">
-              <p className="text-xs text-gray-400 font-medium">Total Bookings</p>
-              <p className="text-3xl font-extrabold text-blue-400 mt-1">
-                {bookingsCount !== null ? bookingsCount : "—"}
-              </p>
-              <Link
-                href="/bookings"
-                className="text-[11px] text-gray-400 hover:text-white underline mt-1 block"
-              >
-                View History →
-              </Link>
+            <div className="flex gap-3">
+              <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 text-center min-w-[130px]">
+                <p className="text-xs text-gray-400 font-medium">Rail Wallet</p>
+                <p className="text-2xl font-extrabold text-amber-400 mt-1">
+                  ₹{balance.toLocaleString("en-IN")}
+                </p>
+                <Link
+                  href="/wallet"
+                  className="text-[11px] text-amber-300 hover:text-white underline mt-1 block"
+                >
+                  Manage Wallet →
+                </Link>
+              </div>
+
+              <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-4 text-center min-w-[130px]">
+                <p className="text-xs text-gray-400 font-medium">Total Bookings</p>
+                <p className="text-2xl font-extrabold text-blue-400 mt-1">
+                  {bookingsCount !== null ? bookingsCount : "—"}
+                </p>
+                <Link
+                  href="/bookings"
+                  className="text-[11px] text-gray-400 hover:text-white underline mt-1 block"
+                >
+                  View History →
+                </Link>
+              </div>
             </div>
           </div>
         </div>

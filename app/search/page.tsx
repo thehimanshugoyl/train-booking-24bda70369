@@ -2,11 +2,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useLanguageStore } from "@/store/useLanguageStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import CoachSeatPicker from "@/components/CoachSeatPicker";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSelector from "@/components/LanguageSelector";
 
 interface PassengerItem {
   name: string;
@@ -31,6 +33,7 @@ export default function Search() {
   const [stationSuggestions, setStationSuggestions] = useState<string[]>([]);
 
   const { user, logout } = useAuthStore();
+  const { t } = useLanguageStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -142,42 +145,49 @@ export default function Search() {
         <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
           <span className="text-gray-300 text-sm hidden md:inline">Hello, {user?.name}</span>
           
+          <LanguageSelector />
           <ThemeToggle />
 
+          <Link
+            href="/wallet"
+            className="text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs font-bold transition flex items-center gap-1.5"
+          >
+            <span>💳</span> {t("wallet")}
+          </Link>
           <Link
             href="/pnr"
             className="bg-gray-800 hover:bg-gray-750 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-lg text-sm font-semibold transition"
           >
-            Track PNR
+            {t("pnrStatus")}
           </Link>
           {user?.role === "admin" && (
             <Link
               href="/admin"
               className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition"
             >
-              ⚙️ Admin
+              ⚙️ {t("admin")}
             </Link>
           )}
           <Link
             href="/profile"
             className="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5"
           >
-            <span>👤</span> Profile
+            <span>👤</span> {t("profile")}
           </Link>
           <Link
             href="/bookings"
             className="bg-gray-800 hover:bg-gray-750 border border-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium transition"
           >
-            🎫 My Bookings
+            🎫 {t("myBookings")}
           </Link>
           <button
             onClick={() => {
               logout();
               router.push("/login");
             }}
-            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+            className="bg-zinc-800 hover:bg-red-900 border border-zinc-700 text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer"
           >
-            Logout
+            {t("logout")}
           </button>
         </div>
       </nav>

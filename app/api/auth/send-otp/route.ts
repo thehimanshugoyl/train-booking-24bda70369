@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/supabase";
 import { sendEmailOtp, sendPhoneOtp } from "@/lib/notificationService";
+import { isAllowedEmail, isValidIndianPhone, cleanIndianPhone } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,23 +14,37 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const cleanIdentifier =
-      type === "phone"
-        ? identifier.replace(/\D/g, "").slice(-10)
-        : identifier.trim().toLowerCase();
+    let cleanIdentifier = "";
 
-    if (type === "phone" && cleanIdentifier.length !== 10) {
-      return NextResponse.json(
-        { error: "Please enter a valid 10-digit Indian mobile number" },
-        { status: 400 }
-      );
-    }
-
-    if (type === "email" && !cleanIdentifier.includes("@")) {
-      return NextResponse.json(
-        { error: "Please enter a valid email address" },
-        { status: 400 }
-      );
+    if (type === "phone") {
+      cleanIdentifier = cleanIndianPhone(identifier);
+      if (!isValidIndianPhone(cleanIdentifier)) {
+        return NextResponse.json(
+          {
+            error:
+              "Only valid 10-digit Indian mobile numbers starting with 6, 7, 8, or 9 are allowed.",
+          },
+          { status: 400 }
+        );
+      }
+    } else {
+      cleanIdentifier = identifier.trim().toLowerCase();
+      // For registration purpose, enforce strict email whitelist
+      if (purpose === "register" && !isAllowedEmail(cleanIdentifier)) {
+        return NextResponse.json(
+          {
+            error:
+              "Only Gmail, Outlook, iCloud, and Yahoo email addresses are allowed for registration.",
+          },
+          { status: 400 }
+        );
+      }
+      if (!cleanIdentifier.includes("@")) {
+        return NextResponse.json(
+          { error: "Please enter a valid email address." },
+          { status: 400 }
+        );
+      }
     }
 
     // If purpose is register, check if email/phone already belongs to an existing user

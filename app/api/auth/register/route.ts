@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/supabase";
 import { signToken } from "@/lib/auth";
+import { isAllowedEmail, isValidIndianPhone, cleanIndianPhone } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,7 +30,28 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const cleanPhone = phone ? phone.replace(/\D/g, "").slice(-10) : "";
+    const cleanPhone = phone ? cleanIndianPhone(phone) : "";
+
+    // 0. Strict Validation: Whitelisted Emails and Indian Mobile
+    if (!isAllowedEmail(cleanEmail)) {
+      return NextResponse.json(
+        {
+          error:
+            "Registration is restricted to Gmail, Outlook, iCloud, and Yahoo email addresses only.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (cleanPhone && !isValidIndianPhone(cleanPhone)) {
+      return NextResponse.json(
+        {
+          error:
+            "Only valid 10-digit Indian mobile numbers starting with 6, 7, 8, or 9 are allowed.",
+        },
+        { status: 400 }
+      );
+    }
 
     // 1. Check existing user by email
     const existingEmail = await db.users.findByEmail(cleanEmail);
